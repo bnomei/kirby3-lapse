@@ -10,12 +10,12 @@ This plugin is free but if you use it in a commercial project please consider to
 
 **get/set**
 ```php
-// Bnomei\Lapse::lapse() or just lapse()
 $key = md($page->url()); // unique key
 // to delay data creation until need use a callback. do not use a plain array or object.
 $data = function () {
     return [1, 2, 3];
 }
+// Bnomei\Lapse::lapse() or just lapse()
 $data = lapse($key, $data);
 
 // EXPIRE
