@@ -8,7 +8,7 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ## Usage
 
-**get/set**
+**Example 1: get/set**
 ```php
 $key = md($page->url()); // unique key
 // to delay data creation until need use a callback. do not use a plain array or object.
@@ -17,12 +17,18 @@ $data = function () {
 }
 // Bnomei\Lapse::lapse() or just lapse()
 $data = lapse($key, $data);
+```
 
+**Example 2: with custom expriation time**
+```php
 // EXPIRE
 // if ommited config settings apply
 $expires = 5; // in minutes. 
 $data = lapse($key, $data, $expires);
+```
 
+**Example 3: without the variables**
+```php
 // compressed code
 $data = lapse(md($page->url()), function () use ($kirby, $site, $page) {
     // create some data. could be array, could be object, anything really.
