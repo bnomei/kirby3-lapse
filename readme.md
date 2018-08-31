@@ -8,7 +8,7 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ## Usage
 
-** get/set **
+**get/set**
 ```php
 // Bnomei\Lapse::lapse() or just lapse()
 $key = md($page->url()); // unique key
@@ -33,13 +33,13 @@ $data = lapse(md($page->url()), function () use ($kirby, $site, $page) {
 }, 5);
 ```
 
-** force **
+**force**
 ```php
 $force = true;
 $data = lapse($key, $data, $expires, $force);
 ```
 
-** flush **
+**flush**
 ```php
 Bnomei\Lapse::flush();
 ```
