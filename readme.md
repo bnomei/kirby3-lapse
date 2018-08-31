@@ -19,7 +19,7 @@ $data = function () {
 $data = lapse($key, $data);
 ```
 
-**Example 2: with custom expriation time**
+**Example 2: with custom expiration time**
 ```php
 // EXPIRE
 // if ommited config settings apply
