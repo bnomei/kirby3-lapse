@@ -18,7 +18,10 @@ class Lapse
         return static::$cache;
     }
 
-    public static function lapse(string $key, $value = null, $expires = null, $force = false) {
+    public static function lapse(string $key, $value = null, $expires = null, $force = null) {
+        if($force == null && option('debug') && option('bnomei.lapse.debugforce')) {
+            $force = true;
+        }
         $response = $force ? null : static::cache()->get($key);
         if(!$response) {
             $response = is_callable($value) ? $value() : $value;

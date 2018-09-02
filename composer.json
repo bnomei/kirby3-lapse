@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-lapse",
     "type": "plugin",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Cache any data until set expiration time",
     "license": "MIT",
     "autoload": {

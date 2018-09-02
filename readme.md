@@ -64,6 +64,7 @@ All settings need `bnomei.lapse.` as prefix.
 
 > This Plugin uses minutes not seconds since K3 Cache does that as well. So be carefull in that regard when migrating from Jens' plugin.
 
+**debugforce** default: `true` force refresh if Kirbys global debug options is active
 
 ## Disclaimer
 
