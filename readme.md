@@ -47,7 +47,7 @@ $data = lapse($key, $data, $expires, $force);
 
 **Tip 1: devalidate on page modification**
 ```php
-$key = md5($page->uid().$page->modified());
+$key = md5($page->id().$page->modified());
 $data = lapse($key, $data);
 ```
 
