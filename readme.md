@@ -39,13 +39,19 @@ $data = lapse(md($page->url()), function () use ($kirby, $site, $page) {
 }, 5);
 ```
 
-**force**
+**Parameter: force**
 ```php
 $force = true;
 $data = lapse($key, $data, $expires, $force);
 ```
 
-**flush**
+**Tip 1: devalidate on page modification**
+```php
+$key = md5($page->uid().$page->modified());
+$data = lapse($key, $data);
+```
+
+**Tip 2: flush cache**
 ```php
 Bnomei\Lapse::flush();
 ```
