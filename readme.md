@@ -11,6 +11,14 @@ This plugin is free but if you use it in a commercial project please consider to
 - [buy me ☕](https://buymeacoff.ee/bnomei) or
 - [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
 
+## Installation
+
+- for devkit-setup use `composer require bnomei/kirby3-lapse` or
+- extract latest release of [kirby3-lapse.zip](https://github.com/bnomei/kirby3-lapse/releases/download/v1.0.3/kirby3-lapse.zip) as folder `site/plugins/kirby3-lapse`
+
+> Installation as a gitsubmodule is *not* supported.
+
+
 ## Usage Examples
 
 **Example 1: get/set**
