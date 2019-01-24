@@ -25,12 +25,15 @@ class Lapse
         $response = $force ? null : static::cache()->get($key);
         if(!$response) {
             $response = is_callable($value) ? $value() : $value;
-            $responseNormalized = array_map(function($d) {
-                if(is_a($d, 'Kirby\Cms\Field')) {
-                    return ''.$d->value();
-                }
-                return $d;
-            }, $response);
+            $responseNormalized = $response;
+            if(!option('bnomei.lapse.field-as-object')) {
+                $responseNormalized = array_map(function ($d) {
+                    if (is_a($d, 'Kirby\Cms\Field')) {
+                        return ''.$d->value();
+                    }
+                    return $d;
+                }, $response);
+            }
             static::cache()->set(
                 $key,
                 $responseNormalized,

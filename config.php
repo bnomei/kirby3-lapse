@@ -5,6 +5,7 @@ Kirby::plugin('bnomei/lapse', [
         'cache' => true,
         'expires' => (60*24), // minutes
         'debugforce' => true,
+        'field-as-object' => false
     ],
 ]);
 
