@@ -1,7 +1,7 @@
 {
     "name": "bnomei/kirby3-lapse",
     "type": "plugin",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Cache any data until set expiration time",
     "license": "MIT",
     "authors": [
@@ -34,12 +34,6 @@
         "optimize-autoloader": true,
         "sort-packages": true
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/k-next/kirby"
-        }
-    ],
     "require": {
         "php": ">=7.1.0",
         "getkirby/cms": "^3.0.0-RC-2.0"
@@ -49,6 +43,7 @@
     },
     "scripts": {
         "zip": [
+            "touch kirby3-lapse.zip",
             "rm kirby3-lapse.zip",
             "composer install --no-dev",
             "composer remove getkirby/cms",

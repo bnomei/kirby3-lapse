@@ -25,9 +25,15 @@ class Lapse
         $response = $force ? null : static::cache()->get($key);
         if(!$response) {
             $response = is_callable($value) ? $value() : $value;
+            $responseNormalized = array_map(function($d) {
+                if(is_a($d, 'Kirby\Cms\Field')) {
+                    return ''.$d->value();
+                }
+                return $d;
+            }, $response);
             static::cache()->set(
                 $key,
-                $response,
+                $responseNormalized,
                 (($expires) ? $expires : option('bnomei.lapse.expires'))
             );
         }
