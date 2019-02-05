@@ -18,15 +18,16 @@ class Lapse
         return static::$cache;
     }
 
-    public static function lapse(string $key, $value = null, $expires = null, $force = null) {
-        if($force == null && option('debug') && option('bnomei.lapse.debugforce')) {
+    public static function lapse(string $key, $value = null, $expires = null, $force = null)
+    {
+        if ($force == null && option('debug') && option('bnomei.lapse.debugforce')) {
             $force = true;
         }
         $response = $force ? null : static::cache()->get($key);
-        if(!$response) {
+        if (!$response) {
             $response = is_callable($value) ? $value() : $value;
             $responseNormalized = $response;
-            if(!option('bnomei.lapse.field-as-object')) {
+            if (!option('bnomei.lapse.field-as-object')) {
                 $responseNormalized = array_map(function ($d) {
                     if (is_a($d, 'Kirby\Cms\Field')) {
                         return ''.$d->value();
@@ -43,8 +44,8 @@ class Lapse
         return $response;
     }
 
-    public static function flush() {
+    public static function flush()
+    {
         static::cache()->flush();
     }
-
 }

@@ -1,6 +1,6 @@
 # Kirby 3 Lapse
 
-![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-lapse.svg?maxAge=1800) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3%2B-black.svg)
+![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-lapse.svg?maxAge=1800) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3%2B-black.svg) ![Kirby 3 Pluginkit](https://img.shields.io/badge/Pluginkit-YES-cca000.svg)
 
 Cache any data until set expiration time.
 
@@ -13,11 +13,9 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ## Installation
 
-- for devkit-setup use `composer require bnomei/kirby3-lapse` or
-- extract latest release of [kirby3-lapse.zip](https://github.com/bnomei/kirby3-lapse/releases/download/v1.0.4/kirby3-lapse.zip) as folder `site/plugins/kirby3-lapse`
-
-> Installation as a gitsubmodule is *not* supported.
-
+- unzip [master.zip](https://github.com/bnomei/kirby3-lapse/archive/master.zip) as folder `site/plugins/kirby3-lapse` or
+- `git submodule add https://github.com/bnomei/kirby3-lapse.git site/plugins/kirby3-lapse` or
+- `composer require bnomei/kirby3-lapse`
 
 ## Usage Examples
 
