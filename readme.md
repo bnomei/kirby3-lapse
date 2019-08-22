@@ -101,6 +101,10 @@ $objects = [$page, $page->images()];
 $data = Lapse::io($objects, ...)
 ```
 
+#### Multi-language support
+
+The keys created by the plugin are [tagged with the current language](https://github.com/bnomei/kirby3-lapse/blob/master/classes/Lapse.php#L181). You will get a different cache value for each language.
+
 #### AutoID
 If you use the AutoID plugin you can use its [modifiedHash()](https://github.com/bnomei/kirby3-autoid#usage-modifiedhash) to get a key with modification timestamps at almost zero-cpu-cost.
 
