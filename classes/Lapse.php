@@ -154,8 +154,10 @@ final class Lapse
             $modified = '';
             // lookup modified zero-cost...
             if ($this->option('autoid') && $key->autoid()->isNotEmpty()) {
+                // @CoverageIgnoreStart
                 $autoid = autoid()->filterBy('autoid', $key->autoid())->first();
-                $modified = $autoid['modified'];
+                $modified = $autoid && is_array($autoid) ? \Kirby\Toolkit\A::get($autoid, 'modified') : $key->modified();
+                // @CoverageIgnoreEnd
             } else {
                 // ... or check file on disk now
                 $modified = $key->modified();
