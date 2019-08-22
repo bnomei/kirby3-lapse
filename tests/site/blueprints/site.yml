@@ -1,0 +1,7 @@
+title: Site
+preset: pages
+unlisted: true
+
+fields:
+  author:
+    type: text

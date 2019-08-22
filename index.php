@@ -5,19 +5,15 @@
 Kirby::plugin('bnomei/lapse', [
     'options' => [
         'cache' => true,
-        'expires' => (60*24), // minutes
-        'debugforce' => true,
-        'field-as-object' => false
+        'expires' => 0,
+        'indexLimit' => null,
+        'jobs' => [ // https://github.com/bnomei/kirby3-janitor
+            'clean' => function (Kirby\Cms\Page $page = null, string $data = null) {
+                return \Bnomei\Lapse::singleton()->clean();
+            },
+            'flush' => function (Kirby\Cms\Page $page = null, string $data = null) {
+                return \Bnomei\Lapse::singleton()->flush();
+            },
+        ],
     ],
 ]);
-
-if (!class_exists('Bnomei\Lapse')) {
-    require_once __DIR__ . '/classes/lapse.php';
-}
-
-if (!function_exists('lapse')) {
-    function lapse(string $key, $value = null, $expires = null, $force = null)
-    {
-        return \Bnomei\Lapse::lapse($key, $value, $expires, $force);
-    }
-}
