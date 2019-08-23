@@ -54,9 +54,12 @@ final class Lapse
         }
     }
 
-    public function option(string $key)
+    public function option(?string $key = null)
     {
-        return \Kirby\Toolkit\A::get($this->options, $key);
+        if ($key) {
+            return \Kirby\Toolkit\A::get($this->options, $key);
+        }
+        return $this->options;
     }
 
     public function getOrSet($key, $value = null, $expires = null)

@@ -88,6 +88,8 @@ class LapseTest extends TestCase
             'debug' => true,
         ]);
 
+        $this->assertEquals(null, $lapse->option('does not exist'));
+        $this->assertIsArray($lapse->option());
         $this->assertEquals(true, $lapse->option('debug'));
 
         $this->assertEquals(null, $lapse->getOrSet('key'));
