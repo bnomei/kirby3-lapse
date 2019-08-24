@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Iterator;
+use Kirby\Cache\Cache;
+use Kirby\Cms\Field;
+use Kirby\Cms\File;
+use Kirby\Cms\FileVersion;
+use Kirby\Cms\Page;
+use Kirby\Toolkit\A;
+
 final class Lapse
 {
     /*
@@ -26,7 +34,7 @@ final class Lapse
      */
     private $cache;
 
-    private function cache(): \Kirby\Cache\Cache
+    private function cache(): Cache
     {
         if (!$this->cache) {
             $this->cache = kirby()->cache('bnomei.lapse');
@@ -57,7 +65,7 @@ final class Lapse
     public function option(?string $key = null)
     {
         if ($key) {
-            return \Kirby\Toolkit\A::get($this->options, $key);
+            return A::get($this->options, $key);
         }
         return $this->options;
     }
@@ -145,7 +153,7 @@ final class Lapse
             return strval($key);
         }
 
-        if (is_array($key) || $key instanceof \Iterator) {
+        if (is_array($key) || $key instanceof Iterator) {
             $items = [];
             foreach ($key as $item) {
                 $items[] = $this->keyFromObject($item);
@@ -153,13 +161,13 @@ final class Lapse
             return implode($items);
         }
 
-        if (is_object($key) && in_array(get_class($key), [\Kirby\Cms\Page::class, \Kirby\Cms\File::class, \Kirby\Cms\FileVersion::class])) {
+        if (is_object($key) && in_array(get_class($key), [Page::class, File::class, FileVersion::class])) {
             $modified = '';
             // lookup modified zero-cost...
             if ($this->option('autoid') && $key->autoid()->isNotEmpty()) {
                 // @codeCoverageIgnoreStart
                 $autoid = autoid()->filterBy('autoid', $key->autoid())->first();
-                $modified = $autoid && is_array($autoid) ? \Kirby\Toolkit\A::get($autoid, 'modified') : $key->modified();
+                $modified = $autoid && is_array($autoid) ? A::get($autoid, 'modified') : $key->modified();
                 // @codeCoverageIgnoreEnd
             } else {
                 // ... or check file on disk now
@@ -168,7 +176,7 @@ final class Lapse
             return $key->id() . $modified;
         }
 
-        if (is_object($key) && in_array(get_class($key), [\Kirby\Cms\Field::class])) {
+        if (is_object($key) && in_array(get_class($key), [Field::class])) {
             return $key->key() . crc32($key->value());
         }
 
