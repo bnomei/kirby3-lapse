@@ -3,6 +3,8 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Bnomei\Lapse;
+use Kirby\Cms\Field;
+use Kirby\Toolkit\Collection;
 use PHPUnit\Framework\TestCase;
 
 class LapseTest extends TestCase
@@ -20,13 +22,13 @@ class LapseTest extends TestCase
 
     public function testPluginDefaults()
     {
-        $this->assertEquals(0, \option('bnomei.lapse.expires'));
-        $this->assertEquals(null, \option('bnomei.lapse.indexLimit'));
+        $this->assertEquals(0, option('bnomei.lapse.expires'));
+        $this->assertEquals(null, option('bnomei.lapse.indexLimit'));
     }
 
     public function testJanitorJobs()
     {
-        $jobs = \option('bnomei.lapse.jobs');
+        $jobs = option('bnomei.lapse.jobs');
         $this->assertIsArray($jobs);
         $this->assertCount(2, $jobs);
 
@@ -67,12 +69,12 @@ class LapseTest extends TestCase
         ]));
 
         // collection aka iterator
-        $this->assertEquals('abc123', $lapse->keyFromObject(new \Kirby\Toolkit\Collection([
+        $this->assertEquals('abc123', $lapse->keyFromObject(new Collection([
             'a', 'b', 'c', 1, 2, 3
         ])));
 
         // field
-        $field = new \Kirby\Cms\Field(null, 'test', 'abc123');
+        $field = new Field(null, 'test', 'abc123');
         $this->assertEquals('test3473062748', $lapse->keyFromObject($field));
         $this->assertEquals('abc123', $lapse->getOrSet('test', $field));
 
@@ -174,7 +176,7 @@ class LapseTest extends TestCase
             function autoid()
             {
                 $home = page('home');
-                return new \Kirby\Toolkit\Collection([
+                return new Collection([
                     [
                         'pageid' => (string) $home->id(),
                         'modified' => $home->modified(),
