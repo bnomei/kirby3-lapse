@@ -57,5 +57,8 @@
   },
   "extra": {
     "kirby-cms-path": "tests/kirby"
+  },
+  "suggest": {
+    "bnomei/kirby3-janitor": "Use a Panel Button or PHP code to clear the cache"
   }
 }
