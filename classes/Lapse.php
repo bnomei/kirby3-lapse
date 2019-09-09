@@ -161,7 +161,12 @@ final class Lapse
             return implode($items);
         }
 
-        if (is_object($key) && in_array(get_class($key), [Page::class, File::class, FileVersion::class])) {
+        if (is_object($key) && (
+                $key instanceof \Kirby\Cms\Page ||
+                $key instanceof \Kirby\Cms\File ||
+                $key instanceof \Kirby\Cms\FileVersion
+            )
+        ) {
             $modified = '';
             // lookup modified zero-cost...
             if ($this->option('autoid') && $key->autoid()->isNotEmpty()) {
