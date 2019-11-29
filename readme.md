@@ -115,12 +115,8 @@ $data = Lapse::io($objects, ...)
 The keys created by the plugin are [tagged with the current language](https://github.com/bnomei/kirby3-lapse/blob/master/classes/Lapse.php#L181). You will get a different cache value for each language.
 
 #### AutoID
-If you use the AutoID plugin you can use its [modifiedHash()](https://github.com/bnomei/kirby3-autoid#usage-modifiedhash) to get a key with modification timestamps at almost zero-cpu-cost.
+If you use the AutoID plugin the modification timestamps will be retrieved at almost zero-cpu-cost and not causing the file to be checked on disk.
 
-```php
-$zero = modifiedHash($autoidCollectionKey);
-$data = Lapse::io($zero, ...)
-```
 
 ## FAQ
 
