@@ -54,7 +54,7 @@ final class Lapse
             'debug' => option('debug'),
             'languageCode' => kirby()->language() ? kirby()->language()->code() : '',
             'indexLimit' => option('bnomei.lapse.indexLimit', null),
-            'autoid' => function_exists('autoid'),
+            'autoid' => function_exists('autoid') && function_exists('modified'),
         ], $options);
 
         if ($this->option('debug')) {
@@ -171,8 +171,10 @@ final class Lapse
             // lookup modified zero-cost...
             if ($this->option('autoid') && $key->autoid()->isNotEmpty()) {
                 // @codeCoverageIgnoreStart
-                $autoid = autoid()->filterBy('autoid', $key->autoid())->first();
-                $modified = $autoid && is_array($autoid) ? A::get($autoid, 'modified') : $key->modified();
+                $modified = modified($key->autoid()->value());
+                if (!$modified) {
+                    $modified = $key->modified();
+                }
                 // @codeCoverageIgnoreEnd
             } else {
                 // ... or check file on disk now

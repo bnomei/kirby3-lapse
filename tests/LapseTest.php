@@ -171,25 +171,17 @@ class LapseTest extends TestCase
         $home = page('home');
         $this->assertNotNull($home);
 
-        // fake autoid function for filter
-        if (!function_exists('autoid')) {
-            function autoid()
+        // fake modified function
+        if (!function_exists('modified')) {
+            function modified($autoid)
             {
-                $home = page('home');
-                return new Collection([
-                    [
-                        'pageid' => (string) $home->id(),
-                        'modified' => $home->modified(),
-                        'autoid' => $home->autoid()->value(),
-                        'type' => 'page',
-                    ],
-                ]);
+                return $autoid === 'abim0u8f' ? page('home')->modified() : null;
             }
         }
 
         $this->assertEquals(
             $home->modified(),
-            autoid()->filterBy('autoid', 'abim0u8f')->first()['modified']
+            modified('abim0u8f')
         );
 
         $data = Bnomei\Lapse::io($home, function () use ($home) {
