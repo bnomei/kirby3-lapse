@@ -4,6 +4,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Bnomei\Lapse;
 use Kirby\Cms\Field;
+use Kirby\Cms\Pages;
 use Kirby\Toolkit\Collection;
 use PHPUnit\Framework\TestCase;
 
@@ -195,5 +196,27 @@ class LapseTest extends TestCase
         $this->assertEquals('Home', $data['title']);
         $this->assertEquals($home->autoid()->value(), $data['autoid']);
         $this->assertEquals($home->modified(), $data['modified']);
+    }
+
+    public function testSerialize()
+    {
+        /*
+         * NOTE: set & get calls are separated for this test to enforce retrieval.
+         * there is no need to write code like this in production.
+         */
+        $page = site()->homePage();
+        Bnomei\Lapse::io($page, function () use ($page) {
+            return $page->id();
+        });
+        $idOfPage = Bnomei\Lapse::io($page);
+        $this->assertEquals($page, page($idOfPage));
+
+        Bnomei\Lapse::io('all-default-templates', function () {
+            $pagesCollection = site()->pages()->filterBy('intendedTemplate', 'default');
+            return $pagesCollection->keys();
+        });
+        $arrayOfIds = Bnomei\Lapse::io('all-default-templates');
+        $pages = new Pages($arrayOfIds);
+        $this->assertTrue($pages->count() === 5);
     }
 }

@@ -1,7 +1,7 @@
 {
   "name": "bnomei/kirby3-lapse",
   "type": "kirby-plugin",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Cache any data until set expiration time",
   "license": "MIT",
   "authors": [
@@ -53,6 +53,12 @@
     "dist": [
       "composer install --no-dev --optimize-autoloader",
       "git rm -rf --cached .; git add .;"
+    ],
+    "kirby": [
+      "composer install",
+      "composer update",
+      "composer install --working-dir=tests/kirby --no-dev --optimize-autoloader",
+      "composer update --working-dir=tests/kirby"
     ]
   },
   "extra": {
