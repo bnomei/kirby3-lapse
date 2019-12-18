@@ -8,10 +8,10 @@ Kirby::plugin('bnomei/lapse', [
         'expires' => 0,
         'indexLimit' => null,
         'jobs' => [ // https://github.com/bnomei/kirby3-janitor
-            'clean' => function (Kirby\Cms\Page $page = null, string $data = null) {
+            'cleanLapse' => function (Kirby\Cms\Page $page = null, string $data = null) {
                 return \Bnomei\Lapse::singleton()->clean();
             },
-            'flush' => function (Kirby\Cms\Page $page = null, string $data = null) {
+            'flushLapse' => function (Kirby\Cms\Page $page = null, string $data = null) {
                 return \Bnomei\Lapse::singleton()->flush();
             },
         ],
