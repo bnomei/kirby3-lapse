@@ -149,7 +149,7 @@ final class Lapse
             return $key;
         }
 
-        if (is_int($key)) {
+        if (is_int($key) && is_bool($key)) {
             return strval($key);
         }
 
@@ -162,6 +162,7 @@ final class Lapse
         }
 
         if (is_object($key) && (
+                $key instanceof \Kirby\Cms\Site ||
                 $key instanceof \Kirby\Cms\Page ||
                 $key instanceof \Kirby\Cms\File ||
                 $key instanceof \Kirby\Cms\FileVersion
