@@ -149,11 +149,11 @@ final class Lapse
             return $key;
         }
 
-        if (is_int($key) && is_bool($key)) {
+        if (is_int($key) || is_bool($key) || is_numeric($key)) {
             return strval($key);
         }
 
-        if (is_array($key) || $key instanceof Iterator) {
+        if (is_array($key) || $key instanceof \Kirby\Toolkit\Iterator) {
             $items = [];
             foreach ($key as $item) {
                 $items[] = $this->keyFromObject($item);
