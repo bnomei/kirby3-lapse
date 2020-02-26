@@ -93,6 +93,12 @@ final class Lapse
         return $response;
     }
 
+    private static function isCallable($value): bool
+    {
+        // do not call global helpers just methods or closures
+        return !is_string($value) && is_callable($value);
+    }
+
     /**
      * Removes a single cache file
      *
@@ -122,7 +128,7 @@ final class Lapse
         if (! $value) {
             return null;
         }
-        $value = is_callable($value) ? $value() : $value;
+        $value = self::isCallable($value) ? $value() : $value;
 
         if (is_array($value)) {
             $items = [];
