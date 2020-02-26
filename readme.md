@@ -48,7 +48,7 @@ $key = crc32($page->url()); // unique key
 // to delay data creation until need use a callback. do not use a plain array or object.
 $data = function () {
     return [1, 2, 3];
-}
+};
 $data = Lapse::io($key, $data);
 ```
 
@@ -58,7 +58,7 @@ $key = crc32($page->url()); // unique key
 $expires = 5; // in minutes. default: 0 aka infinite
 $data = function () {
     return [1, 2, 3];
-}
+};
 $data = Lapse::io($key, $data, $expires);
 ```
 
@@ -123,6 +123,11 @@ If you use the [AutoID plugin](https://github.com/bnomei/kirby3-autoid) the modi
 ### Infinite cache duration by default
 
 Unless you set an expiration when using `Lapse::io()` the cache file will never devalidate. This is because the plugin is intended to be used with keys defining the expiration like `$key = crc32($page->id().$page->modified());`.
+
+```php
+$expires = 5; // in minutes. default: 0 aka infinite
+$data = Lapse::io($key, $data, $expires);
+```
 
 When using Memcache you need to limit the maximum number of caches created since you have a very limited amount if memory of 64MB at default. You can set a limit at `bnomei.lapse.indexLimit` to something like `300`. But be aware that this makes writing to the cache a tiny bit slower since the plugins internal index must be updated.
 

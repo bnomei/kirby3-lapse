@@ -196,22 +196,4 @@ class LapseTest extends TestCase
         $this->assertEquals($home->autoid()->value(), $data['autoid']);
         $this->assertEquals($home->modified(), $data['modified']);
     }
-
-    public function testDoesNotCallGlobalHelperFunctions()
-    {
-        $lapse = new Bnomei\Lapse();
-        $lapse->getOrSet('a', function() {
-            return 'kirby';
-        });
-        $lapse->getOrSet('b', [
-            'kirby', 'size',
-        ]);
-        $lapse->getOrSet('c', [
-            'k'=>'kirby', 's'=>'size',
-        ]);
-
-        $this->assertEquals('kirby', $lapse->getOrSet('a'));
-        $this->assertEquals('kirby', $lapse->getOrSet('b')[0]);
-        $this->assertEquals('kirby', $lapse->getOrSet('c')['k']);
-    }
 }
