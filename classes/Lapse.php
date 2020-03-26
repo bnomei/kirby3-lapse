@@ -178,7 +178,8 @@ final class Lapse
             // lookup modified zero-cost...
             if ($this->option('autoid') && $key->autoid()->isNotEmpty()) {
                 // @codeCoverageIgnoreStart
-                $modified = modified($key->autoid()->value());
+                // use obj not string so autoid can index in needed
+                $modified = modified($key);
                 if (!$modified) {
                     $modified = $key->modified();
                 }
