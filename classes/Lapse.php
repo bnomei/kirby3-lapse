@@ -176,13 +176,17 @@ final class Lapse
         ) {
             $modified = '';
             // lookup modified zero-cost...
-            if ($this->option('autoid') && $key->autoid()->isNotEmpty()) {
+            // do NOT read file from disk:  && $key->autoid()->isNotEmpty()
+            if ($this->option('autoid')) {
                 // @codeCoverageIgnoreStart
-                // use obj not string so autoid can index in needed
+                // use obj not string so autoid can index if needed
                 $modified = modified($key);
+                // autoid will check file on disk if needed
+                /*
                 if (!$modified) {
                     $modified = $key->modified();
                 }
+                */
                 // @codeCoverageIgnoreEnd
             } else {
                 // ... or check file on disk now
