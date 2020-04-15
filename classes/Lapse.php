@@ -190,7 +190,12 @@ final class Lapse
                 // @codeCoverageIgnoreEnd
             } else {
                 // ... or check file on disk now
-                $modified = $key->modified();
+                if($key instanceof \Kirby\Cms\Site) {
+                    // site->modified() would be ALL content files
+                    $modified = filemtime(site()->contentFile());
+                } else {
+                    $modified = $key->modified();
+                }
             }
             return $key->id() . $modified;
         }
