@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Exception;
 use Iterator;
 use Kirby\Cache\Cache;
 use Kirby\Cms\Field;
