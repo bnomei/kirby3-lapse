@@ -260,7 +260,13 @@ final class Lapse
      */
     public function flush(): bool
     {
-        return $this->cache()->flush();
+        $success = false;
+        try {
+            $success = $this->cache()->flush();
+        } catch (Exception $e) {
+            //
+        }
+        return $success;
     }
 
     /*
