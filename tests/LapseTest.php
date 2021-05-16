@@ -199,9 +199,15 @@ class LapseTest extends TestCase
 
     public function testDoesNotCallGlobalHelpers()
     {
-        $a = Bnomei\Lapse::io('a', function() { return 'kirby'; });
-        $b = Bnomei\Lapse::io('b', function() { return ['kirby']; });
-        $c = Bnomei\Lapse::io('c', function() { return ['k' => 'kirby']; });
+        $a = Bnomei\Lapse::io('a', function () {
+            return 'kirby';
+        });
+        $b = Bnomei\Lapse::io('b', function () {
+            return ['kirby'];
+        });
+        $c = Bnomei\Lapse::io('c', function () {
+            return ['k' => 'kirby'];
+        });
 
         $this->assertEquals('kirby', $a);
         $this->assertEquals('kirby', $b[0]);

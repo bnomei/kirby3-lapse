@@ -169,11 +169,11 @@ final class Lapse
         }
 
         if (is_object($key) && (
-                $key instanceof \Kirby\Cms\Site ||
+            $key instanceof \Kirby\Cms\Site ||
                 $key instanceof \Kirby\Cms\Page ||
                 $key instanceof \Kirby\Cms\File ||
                 $key instanceof \Kirby\Cms\FileVersion
-            )
+        )
         ) {
             $modified = '';
             // lookup modified zero-cost...
@@ -182,7 +182,7 @@ final class Lapse
                 // @codeCoverageIgnoreStart
                 // use obj not string so autoid can index if needed
                 $modified = modified($key);
-                // autoid will check file on disk if needed
+            // autoid will check file on disk if needed
                 /*
                 if (!$modified) {
                     $modified = $key->modified();
@@ -191,7 +191,7 @@ final class Lapse
                 // @codeCoverageIgnoreEnd
             } else {
                 // ... or check file on disk now
-                if($key instanceof \Kirby\Cms\Site) {
+                if ($key instanceof \Kirby\Cms\Site) {
                     // site->modified() would be ALL content files
                     $modified = filemtime(site()->contentFile());
                 } else {
