@@ -22,7 +22,7 @@ This plugin is free but if you use it in a commercial project please consider to
 - `git submodule add https://github.com/bnomei/kirby3-lapse.git site/plugins/kirby3-lapse` or
 - `composer require bnomei/kirby3-lapse`
 
-> 🏎️ The fastest cache driver for Kirby is afaik my [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) and you might want to install and set that up to use with the Lapse plugin.
+> 🪶 The fastest cache driver for Kirby is afaik my [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) and you might want to install and set that up to use with the Lapse plugin.
 
 ## Usecase
 
