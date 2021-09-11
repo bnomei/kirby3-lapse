@@ -22,6 +22,8 @@ This plugin is free but if you use it in a commercial project please consider to
 - `git submodule add https://github.com/bnomei/kirby3-lapse.git site/plugins/kirby3-lapse` or
 - `composer require bnomei/kirby3-lapse`
 
+> 🏎️ The fastest cache driver for Kirby is afaik my [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) and you might want to install and set that up to use with the Lapse plugin.
+
 ## Usecase
 
 The Kirby Pages-Cache can cache the output of Page Templates. It devalidates **all** cache files if any Object in the Panel is changed. This is a good choice if you do not make changes often. But if you do make changes often you need a cache that knows what has been modified and which caches to devalidate and which not. 
