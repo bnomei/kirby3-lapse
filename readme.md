@@ -1,4 +1,4 @@
-# Kirby 3 Lapse
+# Kirby3 Lapse
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-lapse?color=ae81ff)
 ![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-lapse?color=272822)
@@ -9,12 +9,19 @@
 
 Cache any data until set expiration time (with automatic keys).
 
-## Commercial Usage
+## Commerical Usage
 
-This plugin is free but if you use it in a commercial project please consider to 
-- [make a donation 🍻](https://www.paypal.me/bnomei/5) or
-- [buy me ☕](https://buymeacoff.ee/bnomei) or
-- [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
+> <br>
+><b>Support open source!</b><br><br>
+> This plugin is free but if you use it in a commercial project please consider to sponsor me or make a donation.<br>
+> If my work helped you to make some cash it seems fair to me that I might get a little reward as well, right?<br><br>
+> Be kind. Share a little. Thanks.<br><br>
+> &dash; Bruno<br>
+> &nbsp; 
+
+| M | O | N | E | Y |
+|---|----|---|---|---|
+| [Github sponsor](https://github.com/sponsors/bnomei) | [Patreon](https://patreon.com/bnomei) | [Buy Me a Coffee](https://buymeacoff.ee/bnomei) | [Paypal dontation](https://www.paypal.me/bnomei/15) | [Buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170) |
 
 ## Installation
 
@@ -112,8 +119,8 @@ $data = Lapse::io($objects, ...)
 
 The keys created by the plugin are [tagged with the current language](https://github.com/bnomei/kirby3-lapse/blob/master/classes/Lapse.php#L181). You will get a different cache value for each language.
 
-#### AutoID
-If you use the [AutoID plugin](https://github.com/bnomei/kirby3-autoid) the modification timestamps will be retrieved at almost zero-cpu-cost and not causing the file to be checked on disk.
+#### AutoID or BoostID
+If you use the [AutoID plugin](https://github.com/bnomei/kirby3-autoid) or [Boost plugin](https://github.com/bnomei/kirby3-boost) the modification timestamps will be retrieved at almost zero-cpu-cost and not causing the file to be checked on disk.
 
 
 ## FAQ
@@ -127,7 +134,7 @@ $expires = 5; // in minutes. default: 0 aka infinite
 $data = Lapse::io($key, $data, $expires);
 ```
 
-When using Memcache you need to limit the maximum number of caches created since you have a very limited amount if memory of 64MB at default. You can set a limit at `bnomei.lapse.indexLimit` to something like `300`. But be aware that this makes writing to the cache a tiny bit slower since the plugins internal index must be updated.
+When using Memcache or APCu you need to limit the maximum number of caches created since you have a very limited amount if memory of 64MB at default. You can set a limit at `bnomei.lapse.indexLimit` to something like `300`. But be aware that this makes writing to the cache a tiny bit slower since the plugins internal index must be updated.
 
 ### No cache when debugging
 
@@ -150,12 +157,12 @@ The plugin uses the default Kirby serialization of objects and since memory refe
 `crc32` is the [fastest](https://stackoverflow.com/a/3665527) hashing algorithm in PHP and the keys do not need to be encrypted.
 
 ### Cache Driver
-For best performance set the **global** [cache driver](https://getkirby.com/docs/reference/system/options/cache#cache-driver) to one using the servers memory not files on the harddisk (even on SSDs). Memcache or ApcuCache can be activated on most hosting enviroments but rarely are by default. Also see `bnomei.lapse.indexLimit` setting explained above.
+For best performance set the **global** [cache driver](https://getkirby.com/docs/reference/system/options/cache#cache-driver) to one using the servers memory not files on the harddisk (even on SSDs). Memcache or ApcuCache can be activated on most hosting enviroments but rarely are by default. Also see `bnomei.lapse.indexLimit` setting explained above. My [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) is not as fast as APCu but still faster than other cache drivers and has no memory limit.
 
 ```php
 return [
   'cache' => [
-    'driver' => 'memcached',
+    'driver' => 'apcu', // sqlite
   ],
 ];
 ```
