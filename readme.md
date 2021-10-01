@@ -9,7 +9,7 @@
 
 Cache any data until set expiration time (with automatic keys).
 
-## Commerical Usage
+## Commercial Usage
 
 > <br>
 ><b>Support open source!</b><br><br>
