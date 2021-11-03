@@ -56,6 +56,7 @@ final class Lapse
             'languageCode' => kirby()->language() ? kirby()->language()->code() : '',
             'indexLimit' => option('bnomei.lapse.indexLimit', null),
             'autoid' => function_exists('autoid') && function_exists('modified'),
+            'boost' => function_exists('boost') && function_exists('modified'),
         ], $options);
 
         if ($this->option('debug')) {
@@ -178,7 +179,7 @@ final class Lapse
             $modified = '';
             // lookup modified zero-cost...
             // do NOT read file from disk:  && $key->autoid()->isNotEmpty()
-            if ($this->option('autoid')) {
+            if ($this->option('autoid') || $this->option('boost')) {
                 // @codeCoverageIgnoreStart
                 // use obj not string so autoid can index if needed
                 $modified = modified($key);
