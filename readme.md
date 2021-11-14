@@ -157,12 +157,12 @@ The plugin uses the default Kirby serialization of objects and since memory refe
 `crc32` is the [fastest](https://stackoverflow.com/a/3665527) hashing algorithm in PHP and the keys do not need to be encrypted.
 
 ### Cache Driver
-For best performance set the **global** [cache driver](https://getkirby.com/docs/reference/system/options/cache#cache-driver) to one using the servers memory not files on the harddisk (even on SSDs). Memcache or ApcuCache can be activated on most hosting enviroments but rarely are by default. Also see `bnomei.lapse.indexLimit` setting explained above. My [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) is not as fast as APCu but still faster than other cache drivers and has no memory limit.
+For best performance set the **global** [cache driver](https://getkirby.com/docs/reference/system/options/cache#cache-driver) to one using the servers memory not files on the harddisk (even on SSDs). Memcache or ApcuCache can be activated on most hosting enviroments but rarely are by default. Also see `bnomei.lapse.indexLimit` setting explained above. My [Redis Cache Driver](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) are faster than other cache drivers and have no memory limit. In all other cases use the very fast [PHP Cache Driver](https://github.com/bnomei/kirby3-php-cachedriver) or APCu.
 
 ```php
 return [
   'cache' => [
-    'driver' => 'apcu', // sqlite
+    'driver' => 'apcu', // php, redis, sqlite
   ],
 ];
 ```
