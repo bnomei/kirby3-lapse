@@ -295,6 +295,15 @@ final class Lapse
         return self::singleton()->getOrSet($key, $value, $expires);
     }
 
+    public static function rm($key) {
+        $lapse = self::singleton();
+        if (!is_string($key)) {
+            $key = $lapse->keyFromObject($key);
+            $key = $lapse->hashKey($key);
+        }
+        return $lapse->remove($key);
+    }
+
     /**
      * @param $key
      * @return string

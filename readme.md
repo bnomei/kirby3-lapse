@@ -80,6 +80,12 @@ $data = Lapse::io(crc32($page->url()), function () use ($kirby, $site, $page) {
 });
 ```
 
+### Remove by Key
+```php
+$key = crc32($page->url()); // unique key
+$wasRemoved = Lapse::rm($key);
+```
+
 ## Clever keys
 
 ### Unique but not modified
@@ -211,8 +217,13 @@ $data = Lapse::io(
     }
 );
 
-// BONUS: if you use autoid the modified lookups will be at almost zero-cpu cost.
+// remove by dynamic key
+$wasRemoved = Lapse::rm(
+    ['myhash', $page, $page->children()->images(), $collection, $site]
+);
 ```
+
+> 🏎️ if you use autoid or boost the modified lookups will be at almost zero-cpu cost.
 
 ## Disclaimer
 
