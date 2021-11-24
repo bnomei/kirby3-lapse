@@ -2,6 +2,20 @@
 
 @include_once __DIR__ . '/vendor/autoload.php';
 
+if (!class_exists('Bnomei\Lapse')) {
+    require_once __DIR__ . '/classes/Lapse.php';
+}
+
+if (! function_exists('lapse')) {
+    function lapse($key, $value = null, $expires = null)
+    {
+        if ($value) {
+            return \Bnomei\Lapse::singleton()->set($key, $value, $expires);
+        }
+        return \Bnomei\Lapse::singleton()->get($key);
+    }
+}
+
 Kirby::plugin('bnomei/lapse', [
     'options' => [
         'cache' => true,

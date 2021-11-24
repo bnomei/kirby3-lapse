@@ -53,7 +53,7 @@ final class Lapse
         $this->options = array_merge([
             'expires' => option('bnomei.lapse.expires', 0),
             'debug' => option('debug'),
-            'languageCode' => kirby()->language() ? kirby()->language()->code() : '',
+            'languageCode' => kirby()->language() ? kirby()->language()->code() : null,
             'indexLimit' => option('bnomei.lapse.indexLimit', null),
             'autoid' => function_exists('autoid') && function_exists('modified'),
             'boost' => function_exists('boost') && function_exists('modified'),
@@ -72,7 +72,12 @@ final class Lapse
         return $this->options;
     }
 
-    public function getOrSet($key, $value = null, $expires = null)
+    public function set($key, $value = null, $expires = null)
+    {
+        return $this->getAndSetIfMissingOrExpired($key, $value, $expires);
+    }
+
+    public function getAndSetIfMissingOrExpired($key, $value = null, $expires = null)
     {
         if ($this->option('debug')) {
             return $this->serialize($value);
@@ -101,15 +106,28 @@ final class Lapse
         return !is_string($value) && is_callable($value);
     }
 
+    public function get($key)
+    {
+        if (!is_string($key)) {
+            $key = $this->keyFromObject($key);
+            $key = $this->hashKey($key);
+        }
+        return $this->cache()->get($key, null);
+    }
+
     /**
      * Removes a single cache file
      *
-     * @param string $key
+     * @param $key
      *
      * @return bool
      */
-    public function remove(string $key): bool
+    public function remove($key): bool
     {
+        if (!is_string($key)) {
+            $key = $this->keyFromObject($key);
+            $key = $this->hashKey($key);
+        }
         if ($this->option('indexLimit')) {
             $index = $this->cache()->get(self::INDEX, []);
             $idx = array_search($key, array_column($index, 0));
@@ -215,7 +233,12 @@ final class Lapse
      */
     public function hashKey(string $key): string
     {
-        return strval(crc32($key . $this->option('languageCode') . self::SALT));
+        $hash = strval(crc32($key . self::SALT));
+        if ($lang = $this->option('languageCode')) {
+            $hash .= '-' . $lang;
+        }
+
+        return $hash;
     }
 
     /**
@@ -292,16 +315,17 @@ final class Lapse
      */
     public static function io($key, $value = null, $expires = null)
     {
-        return self::singleton()->getOrSet($key, $value, $expires);
+        return self::singleton()->getAndSetIfMissingOrExpired($key, $value, $expires);
     }
 
-    public static function rm($key) {
-        $lapse = self::singleton();
-        if (!is_string($key)) {
-            $key = $lapse->keyFromObject($key);
-            $key = $lapse->hashKey($key);
-        }
-        return $lapse->remove($key);
+    public static function gt($key)
+    {
+        return self::singleton()->get($key);
+    }
+
+    public static function rm($key)
+    {
+        return self::singleton()->remove($key);
     }
 
     /**
@@ -310,6 +334,11 @@ final class Lapse
      */
     public static function hash($key)
     {
-        return self::singleton()->hashKey($key);
+        $lapse = self::singleton();
+        if (!is_string($key)) {
+            $key = $lapse->keyFromObject($key);
+            $key = $lapse->hashKey($key);
+        }
+        return $lapse->hashKey($key);
     }
 }

@@ -51,8 +51,8 @@ class LapseTest extends TestCase
 
     public function testHash()
     {
-        $this->assertEquals('1606868144', Bnomei\Lapse::hash('key'));
-        $this->assertEquals('1606868144', Bnomei\Lapse::singleton()->hashKey('key'));
+        $this->assertStringStartsWith('1606868144', Bnomei\Lapse::hash('key'));
+        $this->assertStringStartsWith('1606868144', Bnomei\Lapse::singleton()->hashKey('key'));
     }
 
     public function testKeyFromObject()
@@ -76,12 +76,12 @@ class LapseTest extends TestCase
         // field
         $field = new Field(null, 'test', 'abc123');
         $this->assertEquals('test3473062748', $lapse->keyFromObject($field));
-        $this->assertEquals('abc123', $lapse->getOrSet('test', $field));
+        $this->assertEquals('abc123', $lapse->set('test', $field));
 
-        $this->assertEquals('abc123', $lapse->getOrSet($field, $field));
+        $this->assertEquals('abc123', $lapse->set($field, $field));
         $magic = Bnomei\Lapse::hash('test3473062748');
-        $this->assertEquals('913319500', $magic);
-        $this->assertEquals('abc123', $lapse->getOrSet($magic));
+        $this->assertStringStartsWith('913319500', $magic);
+        $this->assertEquals('abc123', $lapse->set($magic));
     }
 
     public function testDebug()
@@ -94,22 +94,22 @@ class LapseTest extends TestCase
         $this->assertIsArray($lapse->option());
         $this->assertEquals(true, $lapse->option('debug'));
 
-        $this->assertEquals(null, $lapse->getOrSet('key'));
+        $this->assertEquals(null, $lapse->set('key'));
 
-        $lapse->getOrSet('key', 'value');
-        $this->assertEquals(null, $lapse->getOrSet('key'));
-        $this->assertEquals('value', $lapse->getOrSet('key', 'value'));
+        $lapse->set('key', 'value');
+        $this->assertEquals(null, $lapse->set('key'));
+        $this->assertEquals('value', $lapse->set('key', 'value'));
     }
 
     public function testRemove()
     {
         $lapse = new Bnomei\Lapse();
 
-        $lapse->getOrSet('key', 'value');
-        $this->assertEquals('value', $lapse->getOrSet('key'));
+        $lapse->set('key', 'value');
+        $this->assertEquals('value', $lapse->set('key'));
 
         $lapse->remove('key');
-        $this->assertEquals(null, $lapse->getOrSet('key'));
+        $this->assertEquals(null, $lapse->set('key'));
     }
 
     public function testRemoveWithIndexLimit()
@@ -120,18 +120,18 @@ class LapseTest extends TestCase
         ]);
 
         for ($i = 0; $i < $limit; $i++) {
-            $lapse->getOrSet('key' . $i, 'value' . $i);
-            $this->assertEquals('value' . $i, $lapse->getOrSet('key' . $i));
+            $lapse->set('key' . $i, 'value' . $i);
+            $this->assertEquals('value' . $i, $lapse->set('key' . $i));
             usleep(1);
         }
 
         $rnd = rand(0, $limit - 1);
         $lapse->remove('key' . $rnd);
-        $this->assertEquals(null, $lapse->getOrSet('key' . $rnd));
+        $this->assertEquals(null, $lapse->set('key' . $rnd));
 
         for ($i = $limit; $i < $limit * 2; $i++) {
-            $lapse->getOrSet('key' . $i, 'value' . $i);
-            $this->assertEquals('value' . $i, $lapse->getOrSet('key' . $i));
+            $lapse->set('key' . $i, 'value' . $i);
+            $this->assertEquals('value' . $i, $lapse->set('key' . $i));
             usleep(1);
         }
 
@@ -139,7 +139,7 @@ class LapseTest extends TestCase
 
         $this->assertEquals(2, $lapse->updateIndex(null, 2));
         foreach ([2 * $limit - 1, 2 * $limit - 2] as $i) {
-            $this->assertEquals('value' . $i, $lapse->getOrSet('key' . $i));
+            $this->assertEquals('value' . $i, $lapse->set('key' . $i));
         }
     }
 
@@ -212,5 +212,23 @@ class LapseTest extends TestCase
         $this->assertEquals('kirby', $a);
         $this->assertEquals('kirby', $b[0]);
         $this->assertEquals('kirby', $c['k']);
+    }
+
+    public function testHelpers()
+    {
+        $this->assertNull(lapse('hello'));
+        $this->assertEquals('world', lapse('hello', function () {
+            return 'world';
+        }));
+        $this->assertEquals('world', lapse('hello'));
+    }
+
+    public function testExpire()
+    {
+        $this->assertEquals('minit', lapse('60s', function () {
+            return 'minit';
+        }, 1));
+        sleep(61);
+        $this->assertNull(lapse('60s'));
     }
 }

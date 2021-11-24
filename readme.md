@@ -29,8 +29,6 @@ Cache any data until set expiration time (with automatic keys).
 - `git submodule add https://github.com/bnomei/kirby3-lapse.git site/plugins/kirby3-lapse` or
 - `composer require bnomei/kirby3-lapse`
 
-> 🪶 The fastest cache driver for Kirby is afaik my [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) and you might want to install and set that up to use with the Lapse plugin.
-
 ## Usecase
 
 The Kirby Pages-Cache can cache the output of Page Templates. It devalidates **all** cache files if any Object in the Panel is changed. This is a good choice if you do not make changes often. But if you do make changes often you need a cache that knows what has been modified and which caches to devalidate and which not. 
@@ -45,8 +43,6 @@ Lapse was build to do exactly that: **Cache any data until set expiration time.*
 
 ## Usage Examples
 
-For convenience add `use Bnomei\Lapse;` to the top of your PHP skript.
-
 ### Example 1: get/set
 ```php
 $key = crc32($page->url()); // unique key
@@ -54,7 +50,7 @@ $key = crc32($page->url()); // unique key
 $data = function () {
     return [1, 2, 3];
 };
-$data = Lapse::io($key, $data);
+$data = lapse($key, $data);
 ```
 
 ### Example 2: with custom expiration time
@@ -64,12 +60,12 @@ $expires = 5; // in minutes. default: 0 aka infinite
 $data = function () {
     return [1, 2, 3];
 };
-$data = Lapse::io($key, $data, $expires);
+$data = lapse($key, $data, $expires);
 ```
 
 ### Example 3: page object
 ```php
-$data = Lapse::io(crc32($page->url()), function () use ($kirby, $site, $page) {
+$data = lapse(crc32($page->url()), function () use ($kirby, $site, $page) {
     // create some data
     return [
         'author' => site()->author(),
@@ -83,7 +79,7 @@ $data = Lapse::io(crc32($page->url()), function () use ($kirby, $site, $page) {
 ### Remove by Key
 ```php
 $key = crc32($page->url()); // unique key
-$wasRemoved = Lapse::rm($key);
+$wasRemoved = \Bnomei\Lapse::rm($key);
 ```
 
 ## Clever keys
@@ -118,7 +114,7 @@ Since version 2 of this plugin you can also forward any of these and the key wil
 
 ```php
 $objects = [$page, $page->images()];
-$data = Lapse::io($objects, ...)
+$data = lapse($objects, ...)
 ```
 
 #### Multi-language support
@@ -133,11 +129,11 @@ If you use the [AutoID plugin](https://github.com/bnomei/kirby3-autoid) or [Boos
 
 ### Infinite cache duration by default
 
-Unless you set an expiration when using `Lapse::io()` the cache file will never devalidate. This is because the plugin is intended to be used with keys defining the expiration like `$key = crc32($page->id().$page->modified());`.
+Unless you set an expiration when using `lapse()` the cache file will never devalidate. This is because the plugin is intended to be used with keys defining the expiration like `$key = crc32($page->id().$page->modified());`.
 
 ```php
 $expires = 5; // in minutes. default: 0 aka infinite
-$data = Lapse::io($key, $data, $expires);
+$data = lapse($key, $data, $expires);
 ```
 
 When using Memcache or APCu you need to limit the maximum number of caches created since you have a very limited amount if memory of 64MB at default. You can set a limit at `bnomei.lapse.indexLimit` to something like `300`. But be aware that this makes writing to the cache a tiny bit slower since the plugins internal index must be updated.
@@ -152,7 +148,6 @@ The plugin uses the default Kirby serialization of objects and since memory refe
 
 ### Migrating from v1 of this plugin
 
-- `lapse` helpers method is gone: use `Bnomei\Lapse::io()`.
 - `$force` param has been removed: use proper keys.
 - all settings have been removed: they are not needed anymore like explained above.
 
@@ -178,14 +173,14 @@ return [
 ```php
 // lapse v1 could already do this:
 // store data until objects are modified with optional expire
-$data = Lapse::io(
+$data = lapse(
     $page->id().$page->modified(),
     ['some', 'kind', 'of', 'data'],
     60*24*7 // one week
 );
 
 // now it can create magic cache keys from kirby objects
-$data = Bnomei\Lapse::io(
+$data = lapse(
     $page, // key with modification date created by lapse based on object 
     function () use ($page) {
         return [
@@ -196,7 +191,7 @@ $data = Bnomei\Lapse::io(
 
 // or from an collection of pages or files
 $collection = collection('mycollection');
-$data = Lapse::io(
+$data = lapse(
     $collection, // this will turn into a key taking modification date of all objects into consideration
     function () use ($collection) {
         return [ /*...*/ ];
@@ -204,7 +199,7 @@ $data = Lapse::io(
 );
 
 // or from an array combining all these
-$data = Lapse::io(
+$data = lapse(
     ['myhash', $page, $page->children()->images(), $collection, $site], // will create key from array of objects
     function () use ($site, $page, $collection) {
         return [
@@ -218,7 +213,7 @@ $data = Lapse::io(
 );
 
 // remove by dynamic key
-$wasRemoved = Lapse::rm(
+$wasRemoved = \Bnomei\Lapse::rm(
     ['myhash', $page, $page->children()->images(), $collection, $site]
 );
 ```

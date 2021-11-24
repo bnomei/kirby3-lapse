@@ -1,7 +1,11 @@
 title: Site
-preset: pages
-unlisted: true
 
-fields:
-  author:
-    type: text
+sections:
+  fields:
+    type: fields
+    fields:
+      author:
+        type: text
+
+  pages:
+    type: pages

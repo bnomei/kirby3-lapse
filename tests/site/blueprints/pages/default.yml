@@ -1,5 +1,6 @@
 title: Default Page
-preset: page
 fields:
   autoid:
     type: hidden
+  text:
+    type: text

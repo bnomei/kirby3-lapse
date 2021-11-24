@@ -1,4 +1,6 @@
-<?php require_once __DIR__ . '/bootstrap.php';
+<?php
+//require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $kirby = new Kirby();
 
