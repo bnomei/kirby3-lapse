@@ -77,20 +77,51 @@ $data = lapse(crc32($page->url()), function () use ($kirby, $site, $page) {
 ```
 
 ### Remove by Key
+
 ```php
 $key = crc32($page->url()); // unique key
 $wasRemoved = \Bnomei\Lapse::rm($key);
+```
+
+## Static Cache helper - lapseStatic()
+
+Sometimes you need to cache things only for the current request like
+when [reusing Kirbys Collections](https://forum.getkirby.com/t/remember-this-caching-in-kirby/23705/4#solution-with-a-static-cache-3)
+. The `lapseStatic()`-helper makes things like that a bit easier. The closure to generate the data will only be called
+once, set its return value to a static cache and every recurring call to the collection will get the cached collection
+back from static memory array.
+
+**site/plugins/example/index.php**
+
+```php
+<?php
+
+Kirby::plugin('bnomei/example', [
+  'collections' => [
+    // collections have to be a closure that is why it is wrapped in a fn
+    'recent-courses' => fn() => lapseStatic(
+        'recent-courses', // key 
+        function () { // value
+            return page('courses')->children()->listed()->sortBy('name')->limit(10);
+        }
+    )
+]);
 ```
 
 ## Clever keys
 
 ### Unique but not modified
 
-Caches use a string value as key to store and later retrieve the data. The key is usually a hash of the objects id plus some meta data like the contents language. Storing data related to a Page using the `$key = crc32($page->url());` will work just fine. It takes care of the language if you use a multi-language setup since the language is included in the url. But it will expire only if you provide a fixed time or devalidate it yourself.
+Caches use a string value as key to store and later retrieve the data. The key is usually a hash of the objects id plus
+some meta data like the contents language. Storing data related to a Page using the `$key = crc32($page->url());` will
+work just fine. It takes care of the language if you use a multi-language setup since the language is included in the
+url. But it will expire only if you provide a fixed time or devalidate it yourself.
 
 ### Modified
 
-The solution is to include the modification timestamp of every object related to the data. So if you store the result of a Page Object with Images being rendered you need to include the modification timestamp of all of these. That will cause the creation of a new cache every time your source changes.
+The solution is to include the modification timestamp of every object related to the data. So if you store the result of
+a Page Object with Images being rendered you need to include the modification timestamp of all of these. That will cause
+the creation of a new cache every time your source changes.
 
 #### Basic
 
