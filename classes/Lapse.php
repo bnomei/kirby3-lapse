@@ -221,7 +221,7 @@ final class Lapse
         }
 
         if (is_object($key) && in_array(get_class($key), [Field::class])) {
-            return $key->key() . crc32($key->value());
+            return $key->key() . hash('xxh3', $key->value());
         }
 
         return strval($key);
@@ -233,7 +233,7 @@ final class Lapse
      */
     public function hashKey(string $key): string
     {
-        $hash = strval(crc32($key . self::SALT));
+        $hash = strval(hash('xxh3', $key . self::SALT));
         if ($lang = $this->option('languageCode')) {
             $hash .= '-' . $lang;
         }

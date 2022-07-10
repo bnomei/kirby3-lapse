@@ -12,7 +12,7 @@ Cache any data until set expiration time (with automatic keys).
 ## Commercial Usage
 
 > <br>
-><b>Support open source!</b><br><br>
+> <b>Support open source!</b><br><br>
 > This plugin is free but if you use it in a commercial project please consider to sponsor me or make a donation.<br>
 > If my work helped you to make some cash it seems fair to me that I might get a little reward as well, right?<br><br>
 > Be kind. Share a little. Thanks.<br><br>
@@ -45,7 +45,7 @@ Lapse was build to do exactly that: **Cache any data until set expiration time.*
 
 ### Example 1: get/set
 ```php
-$key = crc32($page->url()); // unique key
+$key = hash('xxh3', $page->url()); // unique key
 // to delay data creation until need use a callback. do not use a plain array or object.
 $data = function () {
     return [1, 2, 3];
@@ -55,7 +55,7 @@ $data = lapse($key, $data);
 
 ### Example 2: with custom expiration time
 ```php
-$key = crc32($page->url()); // unique key
+$key = hash('xxh3', $page->url()); // unique key
 $expires = 5; // in minutes. default: 0 aka infinite
 $data = function () {
     return [1, 2, 3];
@@ -65,7 +65,7 @@ $data = lapse($key, $data, $expires);
 
 ### Example 3: page object
 ```php
-$data = lapse(crc32($page->url()), function () use ($kirby, $site, $page) {
+$data = lapse(hash('xxh3', $page->url()), function () use ($kirby, $site, $page) {
     // create some data
     return [
         'author' => site()->author(),
@@ -79,7 +79,7 @@ $data = lapse(crc32($page->url()), function () use ($kirby, $site, $page) {
 ### Remove by Key
 
 ```php
-$key = crc32($page->url()); // unique key
+$key = hash('xxh3', $page->url()); // unique key
 $wasRemoved = \Bnomei\Lapse::rm($key);
 ```
 
@@ -113,7 +113,7 @@ Kirby::plugin('bnomei/example', [
 ### Unique but not modified
 
 Caches use a string value as key to store and later retrieve the data. The key is usually a hash of the objects id plus
-some meta data like the contents language. Storing data related to a Page using the `$key = crc32($page->url());` will
+some meta data like the contents language. Storing data related to a Page using the `$key = hash('xxh3', $page->url());` will
 work just fine. It takes care of the language if you use a multi-language setup since the language is included in the
 url. But it will expire only if you provide a fixed time or devalidate it yourself.
 
@@ -130,7 +130,7 @@ $keys = [ $page->url().$page->modified() ];
 foreach($page->images() as $image) {
     $keys[] = $image->id().$image->modified();
 }
-$key = crc32(implode($keys));
+$key = hash('xxh3', implode($keys));
 ```
 
 #### Objects
@@ -160,7 +160,7 @@ If you use the [AutoID plugin](https://github.com/bnomei/kirby3-autoid) or [Boos
 
 ### Infinite cache duration by default
 
-Unless you set an expiration when using `lapse()` the cache file will never devalidate. This is because the plugin is intended to be used with keys defining the expiration like `$key = crc32($page->id().$page->modified());`.
+Unless you set an expiration when using `lapse()` the cache file will never devalidate. This is because the plugin is intended to be used with keys defining the expiration like `$key = hash('xxh3', $page->id().$page->modified());`.
 
 ```php
 $expires = 5; // in minutes. default: 0 aka infinite
@@ -186,10 +186,10 @@ The plugin uses the default Kirby serialization of objects and since memory refe
 
 ### Use crc32 to generate the hash
 
-`crc32` is the [fastest](https://stackoverflow.com/a/3665527) hashing algorithm in PHP and the keys do not need to be encrypted.
+`xxh3` is the [fastest](https://php.watch/versions/8.1/xxHash) non cryptographic hashing hashing algorithm in PHP 8.1 . The keys for lapse do not need to be encrypted.
 
 ### Cache Driver
-For best performance set the **global** [cache driver](https://getkirby.com/docs/reference/system/options/cache#cache-driver) to one using the servers memory not files on the harddisk (even on SSDs). Memcache or ApcuCache can be activated on most hosting enviroments but rarely are by default. Also see `bnomei.lapse.indexLimit` setting explained above. My [Redis Cache Driver](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) are faster than other cache drivers and have no memory limit. In all other cases use the very fast [PHP Cache Driver](https://github.com/bnomei/kirby3-php-cachedriver) or APCu.
+For best performance set the **global** [cache driver](https://getkirby.com/docs/reference/system/options/cache#cache-driver) to one using the servers memory not files on the harddisk (even on SSDs). Memcache or ApcuCache can be activated on most hosting environments but rarely are by default. Also see `bnomei.lapse.indexLimit` setting explained above. My [Redis Cache Driver](https://github.com/bnomei/kirby3-redis-cachedriver) and [SQLite Cache Driver](https://github.com/bnomei/kirby3-sqlite-cachedriver) are faster than other cache drivers and have no memory limit. In all other cases use the very fast [PHP Cache Driver](https://github.com/bnomei/kirby3-php-cachedriver) or APCu.
 
 ```php
 return [
