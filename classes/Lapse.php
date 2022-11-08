@@ -207,7 +207,7 @@ final class Lapse
                     $modified = $key->modified();
                 }
                 */
-                // @codeCoverageIgnoreEnd
+            // @codeCoverageIgnoreEnd
             } else {
                 // ... or check file on disk now
                 if ($key instanceof \Kirby\Cms\Site) {
@@ -274,7 +274,7 @@ final class Lapse
     /**
      * @return bool
      */
-    public function clean(): bool
+    public function prune(): bool
     {
         return $this->updateIndex(null, self::INDEX_LIMIT) <= self::INDEX_LIMIT;
     }

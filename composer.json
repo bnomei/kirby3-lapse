@@ -1,7 +1,7 @@
 {
   "name": "bnomei/kirby3-lapse",
   "type": "kirby-plugin",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Cache any data until set expiration time",
   "license": "MIT",
   "authors": [
@@ -40,7 +40,7 @@
     "getkirby/composer-installer": "^1.2"
   },
   "require-dev": {
-    "getkirby/cms": "^3.5",
+    "getkirby/cms": "^3.8.1.1",
     "php-coveralls/php-coveralls": "^2.4",
     "phpunit/phpunit": "^9.5"
   },

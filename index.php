@@ -30,13 +30,21 @@ Kirby::plugin('bnomei/lapse', [
         'cache' => true,
         'expires' => 0,
         'indexLimit' => null,
-        'jobs' => [ // https://github.com/bnomei/kirby3-janitor
-            'cleanLapse' => function (Kirby\Cms\Page $page = null, string $data = null) {
-                return \Bnomei\Lapse::singleton()->clean();
-            },
-            'flushLapse' => function (Kirby\Cms\Page $page = null, string $data = null) {
-                return \Bnomei\Lapse::singleton()->flush();
+    ],
+    'commands' => [ // https://github.com/getkirby/cli
+        'lapse:prune' => [
+            'description' => 'Prune cache Lapse plugin',
+            'args' => [],
+            'command' => static function ($cli) {
+                return \Bnomei\Lapse::singleton()->prune();
             },
         ],
+        'lapse:flush' => [
+            'description' => 'Flush cache of Lapse plugin',
+            'args' => [],
+            'command' => static function ($cli) {
+                return \Bnomei\Lapse::singleton()->flush();
+            },
+        ]
     ],
 ]);

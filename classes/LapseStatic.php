@@ -7,9 +7,9 @@ use Kirby\Toolkit\A;
 
 class LapseStatic
 {
-    static array $cache = [];
+    public static array $cache = [];
 
-    static function getOrSet($key, Closure $closure)
+    public static function getOrSet($key, Closure $closure)
     {
         $key = Lapse::singleton()->keyFromObject($key);
 
@@ -24,4 +24,3 @@ class LapseStatic
         return static::$cache[$key];
     }
 }
-
