@@ -26,18 +26,6 @@ class LapseTest extends TestCase
         $this->assertEquals(null, option('bnomei.lapse.indexLimit'));
     }
 
-    public function testJanitorJobs()
-    {
-        $jobs = option('bnomei.lapse.jobs');
-        $this->assertIsArray($jobs);
-        $this->assertCount(2, $jobs);
-
-        foreach ($jobs as $job) {
-            $this->assertTrue(is_callable($job));
-            $this->assertIsBool($job());
-        }
-    }
-
     public function testStaticIO()
     {
         $this->assertEquals(null, Bnomei\Lapse::io('key'));
@@ -51,8 +39,8 @@ class LapseTest extends TestCase
 
     public function testHash()
     {
-        $this->assertStringStartsWith('1606868144', Bnomei\Lapse::hash('key'));
-        $this->assertStringStartsWith('1606868144', Bnomei\Lapse::singleton()->hashKey('key'));
+        $this->assertStringStartsWith('4c9f09aa4db9a125-en', Bnomei\Lapse::hash('key'));
+        $this->assertStringStartsWith('4c9f09aa4db9a125-en', Bnomei\Lapse::singleton()->hashKey('key'));
     }
 
     public function testKeyFromObject()
@@ -75,12 +63,12 @@ class LapseTest extends TestCase
 
         // field
         $field = new Field(null, 'test', 'abc123');
-        $this->assertEquals('test3473062748', $lapse->keyFromObject($field));
+        $this->assertEquals('test33739d7bb9744cd0', $lapse->keyFromObject($field));
         $this->assertEquals('abc123', $lapse->set('test', $field));
 
         $this->assertEquals('abc123', $lapse->set($field, $field));
-        $magic = Bnomei\Lapse::hash('test3473062748');
-        $this->assertStringStartsWith('913319500', $magic);
+        $magic = Bnomei\Lapse::hash('test33739d7bb9744cd0');
+        $this->assertStringStartsWith('cad13c0c16c52d6d', $magic);
         $this->assertEquals('abc123', $lapse->set($magic));
     }
 
