@@ -217,6 +217,19 @@ final class Lapse
                     $modified = $key->modified();
                 }
             }
+
+            // also factor in modified for default language in case there are non-translatable fields
+            // BUT do not use as key but concat so it creates a caches for each language.
+            // this has nothing to do with uuids or autoid or boost but only with what one would expect
+            // the automatic key of lapse per object to be.
+            if (kirby()->multilang()) {
+                if ($key instanceof \Kirby\Cms\Site) {
+                    $modified = $modified . filemtime(site()->contentFile(kirby()->defaultLanguage()->code()));
+                } else {
+                    $modified = $modified . $key->modified(kirby()->defaultLanguage()->code());
+                }
+            }
+
             return $key->id() . $modified;
         }
 
