@@ -5,12 +5,8 @@ declare(strict_types=1);
 namespace Bnomei;
 
 use Exception;
-use Iterator;
 use Kirby\Cache\Cache;
-use Kirby\Cms\Field;
-use Kirby\Cms\File;
-use Kirby\Cms\FileVersion;
-use Kirby\Cms\Page;
+use Kirby\Content\Field;
 use Kirby\Toolkit\A;
 
 final class Lapse
@@ -158,7 +154,7 @@ final class Lapse
             return $items;
         }
 
-        if (is_a($value, 'Kirby\Cms\Field')) {
+        if (is_a($value, 'Kirby\Content\Field')) {
             return $value->value();
         }
 

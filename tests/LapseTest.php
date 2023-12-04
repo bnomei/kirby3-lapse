@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Bnomei\Lapse;
-use Kirby\Cms\Field;
+use Kirby\Content\Field;
 use Kirby\Toolkit\Collection;
 use PHPUnit\Framework\TestCase;
 
