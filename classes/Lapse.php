@@ -208,7 +208,7 @@ final class Lapse
                 // ... or check file on disk now
                 if ($key instanceof \Kirby\Cms\Site) {
                     // site->modified() would be ALL content files
-                    $modified = filemtime(site()->contentFile());
+                    $modified = site()->modifiedTimestamp();
                 } else {
                     $modified = $key->modified();
                 }

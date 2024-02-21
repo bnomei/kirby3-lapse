@@ -47,4 +47,9 @@ Kirby::plugin('bnomei/lapse', [
             },
         ]
     ],
+    'siteMethods' => [
+        'modifiedTimestamp' => function (): int {
+            return filemtime(site()->storage()->contentFiles(site()->storage()->defaultVersion())[0]);
+        },
+    ],
 ]);
