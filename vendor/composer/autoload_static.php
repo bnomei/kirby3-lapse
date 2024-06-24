@@ -30,6 +30,7 @@ class ComposerStaticInitd9ec4f590bd3ba6e2de6935ec3aa4800
 
     public static $classMap = array (
         'Bnomei\\Lapse' => __DIR__ . '/../..' . '/classes/Lapse.php',
+        'Bnomei\\LapseCancelException' => __DIR__ . '/../..' . '/classes/LapseCancelException.php',
         'Bnomei\\LapseStatic' => __DIR__ . '/../..' . '/classes/LapseStatic.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Kirby\\ComposerInstaller\\CmsInstaller' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/CmsInstaller.php',

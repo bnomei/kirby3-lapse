@@ -251,6 +251,24 @@ $wasRemoved = \Bnomei\Lapse::rm(
 
 > 🏎️ if you use autoid or boost the modified lookups will be at almost zero-cpu cost.
 
+## Cancel the caching
+
+If you want to cancel the caching you can throw the `LapseCancelException` in the closure. This will prevent the caching of the data and return `null`.
+
+```php
+$data = lapse(
+    $page,
+    function () use ($page) {
+        if ($page->isUnpublished()) {
+            // do not cache unpublished pages
+            throw new \Bnomei\LapseCancelException();
+        }
+        return $page->title()->value();
+    }
+);
+// $data === null for unpublished pages
+```
+
 ## Disclaimer
 
 This plugin is provided "as is" with no guarantee. Use it at your own risk and always test it yourself before using it in a production environment. If you find any issues, please [create a new issue](https://github.com/bnomei/kirby3-lapse/issues/new).

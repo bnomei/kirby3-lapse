@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Bnomei\LapseCancelException;
 use Bnomei\Lapse;
 use Kirby\Content\Field;
 use Kirby\Toolkit\Collection;
@@ -218,5 +219,22 @@ class LapseTest extends TestCase
         }, 1));
         sleep(61);
         $this->assertNull(lapse('60s'));
+    }
+
+    public function testCancelCaching()
+    {
+        $this->assertEquals('world', lapse('hello', function () {
+            return 'world';
+        }));
+        $this->assertEquals('world', lapse('hello', function () {
+            return 'not called because its cached without expiration';
+        }));
+
+        Lapse::rm('hello');
+        $this->assertEquals(null, lapse('hello', function () {
+            throw new LapseCancelException();
+
+            return 'bogus'; // never called
+        }));
     }
 }

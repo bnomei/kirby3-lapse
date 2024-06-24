@@ -88,10 +88,15 @@ final class Lapse
             return $response;
         }
 
-        $response = $this->serialize($value);
-        $expires = $expires ?? $this->option('expires');
-        $this->cache()->set(strval($key), $response, intval($expires));
-        $this->updateIndex($key, $this->option('indexLimit'));
+        try {
+            $response = $this->serialize($value); // might throw LapseCancelException
+            $expires = $expires ?? $this->option('expires');
+            $this->cache()->set(strval($key), $response, intval($expires));
+            $this->updateIndex($key, $this->option('indexLimit'));
+        } catch (LapseCancelException $e) {
+            // do not cache exceptions
+            return null;
+        }
 
         return $response;
     }
