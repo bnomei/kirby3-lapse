@@ -228,7 +228,7 @@ final class Lapse
                     $siteFile = site()->storage()->read(
                         site()->storage()->defaultVersion(),
                         kirby()->defaultLanguage()->code()
-                    );
+                    )[0];
                     $modified = $modified . filemtime($siteFile);
                 } else {
                     $modified = $modified . $key->modified(kirby()->defaultLanguage()->code());
