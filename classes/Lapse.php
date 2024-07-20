@@ -76,7 +76,11 @@ final class Lapse
     public function getAndSetIfMissingOrExpired($key, $value = null, $expires = null)
     {
         if ($this->option('debug')) {
-            return $this->serialize($value);
+            try {
+                return $this->serialize($value);
+            } catch (LapseCancelException $e) {
+                return null;
+            }
         }
 
         if (!is_string($key)) {
