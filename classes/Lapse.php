@@ -229,7 +229,7 @@ final class Lapse
             // the automatic key of lapse per object to be.
             if (kirby()->multilang()) {
                 if ($key instanceof \Kirby\Cms\Site) {
-                    $siteFile = site()->storage()->read(
+                    $siteFile = site()->storage()->contentFile(
                         site()->storage()->defaultVersion(),
                         kirby()->defaultLanguage()->code()
                     )[0];

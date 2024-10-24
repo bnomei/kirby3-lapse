@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'bnomei/kirby3-lapse',
-        'pretty_version' => '4.1.4',
-        'version' => '4.1.4.0',
+        'pretty_version' => '4.1.5',
+        'version' => '4.1.5.0',
         'reference' => null,
         'type' => 'kirby-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -11,8 +11,8 @@
     ),
     'versions' => array(
         'bnomei/kirby3-lapse' => array(
-            'pretty_version' => '4.1.4',
-            'version' => '4.1.4.0',
+            'pretty_version' => '4.1.5',
+            'version' => '4.1.5.0',
             'reference' => null,
             'type' => 'kirby-plugin',
             'install_path' => __DIR__ . '/../../',
