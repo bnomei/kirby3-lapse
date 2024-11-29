@@ -8,6 +8,7 @@
 [![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-lapse?icon=codeclimate&label)](https://codeclimate.com/github/bnomei/kirby3-lapse/issues)
 [![Discord](https://flat.badgen.net/badge/discord/bnomei?color=7289da&icon=discord&label)](https://discordapp.com/users/bnomei)
 [![Buymecoffee](https://flat.badgen.net/badge/icon/donate?icon=buymeacoffee&color=FF813F&label)](https://www.buymeacoffee.com/bnomei)
+
 Cache any data until set expiration time (with automatic keys).
 
 ## Installation
