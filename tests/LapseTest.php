@@ -1,240 +1,217 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
-use Bnomei\LapseCancelException;
 use Bnomei\Lapse;
+use Bnomei\LapseCancelException;
 use Kirby\Content\Field;
 use Kirby\Toolkit\Collection;
-use PHPUnit\Framework\TestCase;
 
-class LapseTest extends TestCase
-{
-    public function setUp(): void
-    {
-        kirby()->cache('bnomei.lapse')->flush();
+beforeEach(function () {
+    kirby()->cache('bnomei.lapse')->flush();
+});
+
+test('construct', function () {
+    $lapse = new Bnomei\Lapse([]);
+    expect($lapse)->toBeInstanceOf(Bnomei\Lapse::class);
+});
+
+test('plugin defaults', function () {
+    expect(option('bnomei.lapse.expires'))->toEqual(0)
+        ->and(option('bnomei.lapse.indexLimit'))->toEqual(null);
+});
+
+test('static io', function () {
+    expect(Bnomei\Lapse::io('key'))->toEqual(null);
+
+    Bnomei\Lapse::io('key', 'value');
+    expect(Bnomei\Lapse::io('key'))->toEqual('value');
+
+    Bnomei\Lapse::singleton()->flush();
+    expect(Bnomei\Lapse::io('key'))->toEqual(null);
+});
+
+test('hash', function () {
+    expect(Bnomei\Lapse::hash('key'))->toStartWith('4c9f09aa4db9a125-en')
+        ->and(Bnomei\Lapse::singleton()->hashKey('key'))->toStartWith('4c9f09aa4db9a125-en');
+});
+
+test('key from object', function () {
+    $lapse = new Bnomei\Lapse;
+    expect($lapse->keyFromObject(null))->toEqual(strval(null))
+        ->and($lapse->keyFromObject('key'))->toEqual('key')
+        ->and($lapse->keyFromObject(1))->toBeString()
+        ->and($lapse->keyFromObject(1))->toEqual('1')
+        ->and($lapse->keyFromObject([
+            'a', 'b', 'c', 1, 2, 3,
+        ]))->toEqual('abc123')
+        ->and($lapse->keyFromObject(new Collection([
+            'a', 'b', 'c', 1, 2, 3,
+        ])))->toEqual('abc123');
+
+    // array
+
+    // collection aka iterator
+
+    // field
+    $field = new Field(null, 'test', 'abc123');
+    expect($lapse->keyFromObject($field))->toEqual('test33739d7bb9744cd0')
+        ->and($lapse->set('test', $field))->toEqual('abc123')
+        ->and($lapse->set($field, $field))->toEqual('abc123');
+
+    $magic = Bnomei\Lapse::hash('test33739d7bb9744cd0');
+    expect($magic)->toStartWith('cad13c0c16c52d6d')
+        ->and($lapse->set($magic))->toEqual('abc123');
+});
+
+test('debug', function () {
+    $lapse = new Bnomei\Lapse([
+        'debug' => true,
+    ]);
+
+    expect($lapse->option('does not exist'))->toEqual(null)
+        ->and($lapse->option())->toBeArray()
+        ->and($lapse->option('debug'))->toEqual(true)
+        ->and($lapse->set('key'))->toEqual(null);
+
+    $lapse->set('key', 'value');
+    expect($lapse->set('key'))->toEqual(null)
+        ->and($lapse->set('key', 'value'))->toEqual('value');
+});
+
+test('remove', function () {
+    $lapse = new Bnomei\Lapse;
+
+    $lapse->set('key', 'value');
+    expect($lapse->set('key'))->toEqual('value');
+
+    $lapse->remove('key');
+    expect($lapse->set('key'))->toEqual(null);
+});
+
+test('remove with index limit', function () {
+    $limit = 100;
+    $lapse = new Bnomei\Lapse([
+        'indexLimit' => $limit,
+    ]);
+
+    for ($i = 0; $i < $limit; $i++) {
+        $lapse->set('key'.$i, 'value'.$i);
+        expect($lapse->set('key'.$i))->toEqual('value'.$i);
+        usleep(1);
     }
 
-    public function testConstruct()
-    {
-        $lapse = new Bnomei\Lapse([]);
-        $this->assertInstanceOf(Bnomei\Lapse::class, $lapse);
+    $rnd = rand(0, $limit - 1);
+    $lapse->remove('key'.$rnd);
+    expect($lapse->set('key'.$rnd))->toEqual(null);
+
+    for ($i = $limit; $i < $limit * 2; $i++) {
+        $lapse->set('key'.$i, 'value'.$i);
+        expect($lapse->set('key'.$i))->toEqual('value'.$i);
+        usleep(1);
     }
 
-    public function testPluginDefaults()
-    {
-        $this->assertEquals(0, option('bnomei.lapse.expires'));
-        $this->assertEquals(null, option('bnomei.lapse.indexLimit'));
+    expect($lapse->updateIndex(null, $limit))->toEqual($limit)
+        ->and($lapse->updateIndex(null, 2))->toEqual(2);
+
+    foreach ([2 * $limit - 1, 2 * $limit - 2] as $i) {
+        expect($lapse->set('key'.$i))->toEqual('value'.$i);
     }
+});
 
-    public function testStaticIO()
-    {
-        $this->assertEquals(null, Bnomei\Lapse::io('key'));
+test('modified', function () {
+    $home = page('home');
+    expect($home)->not->toBeNull();
 
-        Bnomei\Lapse::io('key', 'value');
-        $this->assertEquals('value', Bnomei\Lapse::io('key'));
+    $site = kirby()->site();
+    expect($site)->not->toBeNull()
+        ->and($site->author()->value())->toEqual('Bnomei');
 
-        Bnomei\Lapse::singleton()->flush();
-        $this->assertEquals(null, Bnomei\Lapse::io('key'));
-    }
+    $data = Bnomei\Lapse::io($home, function () use ($site, $home) {
+        return [
+            'title' => $home->title(),
+            'autoid' => $home->autoid(),
+            'modified' => $home->modified(),
+            'author' => $site->author()->value(),
+        ];
+    });
 
-    public function testHash()
-    {
-        $this->assertStringStartsWith('4c9f09aa4db9a125-en', Bnomei\Lapse::hash('key'));
-        $this->assertStringStartsWith('4c9f09aa4db9a125-en', Bnomei\Lapse::singleton()->hashKey('key'));
-    }
+    expect($data['title'])->toEqual('Home')
+        ->and($data['modified'])->toEqual($home->modified())
+        ->and($data['author'])->toEqual('Bnomei');
+});
 
-    public function testKeyFromObject()
-    {
-        $lapse = new Bnomei\Lapse();
-        $this->assertEquals(strval(null), $lapse->keyFromObject(null));
-        $this->assertEquals('key', $lapse->keyFromObject('key'));
-        $this->assertIsString($lapse->keyFromObject(1));
-        $this->assertEquals('1', $lapse->keyFromObject(1));
+test('modified with auto id', function () {
+    $home = page('home');
+    expect($home)->not->toBeNull();
 
-        // array
-        $this->assertEquals('abc123', $lapse->keyFromObject([
-            'a', 'b', 'c', 1, 2, 3
-        ]));
-
-        // collection aka iterator
-        $this->assertEquals('abc123', $lapse->keyFromObject(new Collection([
-            'a', 'b', 'c', 1, 2, 3
-        ])));
-
-        // field
-        $field = new Field(null, 'test', 'abc123');
-        $this->assertEquals('test33739d7bb9744cd0', $lapse->keyFromObject($field));
-        $this->assertEquals('abc123', $lapse->set('test', $field));
-
-        $this->assertEquals('abc123', $lapse->set($field, $field));
-        $magic = Bnomei\Lapse::hash('test33739d7bb9744cd0');
-        $this->assertStringStartsWith('cad13c0c16c52d6d', $magic);
-        $this->assertEquals('abc123', $lapse->set($magic));
-    }
-
-    public function testDebug()
-    {
-        $lapse = new Bnomei\Lapse([
-            'debug' => true,
-        ]);
-
-        $this->assertEquals(null, $lapse->option('does not exist'));
-        $this->assertIsArray($lapse->option());
-        $this->assertEquals(true, $lapse->option('debug'));
-
-        $this->assertEquals(null, $lapse->set('key'));
-
-        $lapse->set('key', 'value');
-        $this->assertEquals(null, $lapse->set('key'));
-        $this->assertEquals('value', $lapse->set('key', 'value'));
-    }
-
-    public function testRemove()
-    {
-        $lapse = new Bnomei\Lapse();
-
-        $lapse->set('key', 'value');
-        $this->assertEquals('value', $lapse->set('key'));
-
-        $lapse->remove('key');
-        $this->assertEquals(null, $lapse->set('key'));
-    }
-
-    public function testRemoveWithIndexLimit()
-    {
-        $limit = 100;
-        $lapse = new Bnomei\Lapse([
-            'indexLimit' => $limit,
-        ]);
-
-        for ($i = 0; $i < $limit; $i++) {
-            $lapse->set('key' . $i, 'value' . $i);
-            $this->assertEquals('value' . $i, $lapse->set('key' . $i));
-            usleep(1);
+    // fake modified function
+    if (! function_exists('modified')) {
+        function modified($autoid)
+        {
+            return $autoid === 'abim0u8f' ? page('home')->modified() : null;
         }
-
-        $rnd = rand(0, $limit - 1);
-        $lapse->remove('key' . $rnd);
-        $this->assertEquals(null, $lapse->set('key' . $rnd));
-
-        for ($i = $limit; $i < $limit * 2; $i++) {
-            $lapse->set('key' . $i, 'value' . $i);
-            $this->assertEquals('value' . $i, $lapse->set('key' . $i));
-            usleep(1);
-        }
-
-        $this->assertEquals($limit, $lapse->updateIndex(null, $limit));
-
-        $this->assertEquals(2, $lapse->updateIndex(null, 2));
-        foreach ([2 * $limit - 1, 2 * $limit - 2] as $i) {
-            $this->assertEquals('value' . $i, $lapse->set('key' . $i));
-        }
     }
 
-    public function testModified()
-    {
-        $home = page('home');
-        $this->assertNotNull($home);
+    expect(modified('abim0u8f'))->toEqual($home->modified());
 
-        $site = kirby()->site();
-        $this->assertNotNull($site);
-        $this->assertEquals('Bnomei', $site->author()->value());
+    $data = Bnomei\Lapse::io($home, function () use ($home) {
+        return [
+            'title' => $home->title(),
+            'autoid' => $home->autoid(),
+            'modified' => $home->modified(),
+        ];
+    });
 
-        $data = Bnomei\Lapse::io($home, function () use ($site, $home) {
-            return [
-                'title' => $home->title(),
-                'autoid' => $home->autoid(),
-                'modified' => $home->modified(),
-                'author' => $site->author()->value(),
-            ];
-        });
+    expect($data['title'])->toEqual('Home')
+        ->and($data['autoid'])->toEqual($home->autoid()->value())
+        ->and($data['modified'])->toEqual($home->modified());
+});
 
-        $this->assertEquals('Home', $data['title']);
-        $this->assertEquals($home->modified(), $data['modified']);
-        $this->assertEquals('Bnomei', $data['author']);
-    }
+test('does not call global helpers', function () {
+    $a = Bnomei\Lapse::io('a', function () {
+        return 'kirby';
+    });
+    $b = Bnomei\Lapse::io('b', function () {
+        return ['kirby'];
+    });
+    $c = Bnomei\Lapse::io('c', function () {
+        return ['k' => 'kirby'];
+    });
 
-    public function testModifiedWithAutoID()
-    {
-        $home = page('home');
-        $this->assertNotNull($home);
+    expect($a)->toEqual('kirby')
+        ->and($b[0])->toEqual('kirby')
+        ->and($c['k'])->toEqual('kirby');
+});
 
-        // fake modified function
-        if (!function_exists('modified')) {
-            function modified($autoid)
-            {
-                return $autoid === 'abim0u8f' ? page('home')->modified() : null;
-            }
-        }
-
-        $this->assertEquals(
-            $home->modified(),
-            modified('abim0u8f')
-        );
-
-        $data = Bnomei\Lapse::io($home, function () use ($home) {
-            return [
-               'title' => $home->title(),
-               'autoid' => $home->autoid(),
-               'modified' => $home->modified(),
-           ];
-        });
-
-        $this->assertEquals('Home', $data['title']);
-        $this->assertEquals($home->autoid()->value(), $data['autoid']);
-        $this->assertEquals($home->modified(), $data['modified']);
-    }
-
-    public function testDoesNotCallGlobalHelpers()
-    {
-        $a = Bnomei\Lapse::io('a', function () {
-            return 'kirby';
-        });
-        $b = Bnomei\Lapse::io('b', function () {
-            return ['kirby'];
-        });
-        $c = Bnomei\Lapse::io('c', function () {
-            return ['k' => 'kirby'];
-        });
-
-        $this->assertEquals('kirby', $a);
-        $this->assertEquals('kirby', $b[0]);
-        $this->assertEquals('kirby', $c['k']);
-    }
-
-    public function testHelpers()
-    {
-        $this->assertNull(lapse('hello'));
-        $this->assertEquals('world', lapse('hello', function () {
+test('helpers', function () {
+    expect(lapse('hello'))->toBeNull()
+        ->and(lapse('hello', function () {
             return 'world';
-        }));
-        $this->assertEquals('world', lapse('hello'));
-    }
+        }))->toEqual('world')
+        ->and(lapse('hello'))->toEqual('world');
+});
 
-    public function testExpire()
-    {
-        $this->assertEquals('minit', lapse('60s', function () {
-            return 'minit';
-        }, 1));
-        sleep(61);
-        $this->assertNull(lapse('60s'));
-    }
-
-    public function testCancelCaching()
-    {
-        $this->assertEquals('world', lapse('hello', function () {
-            return 'world';
-        }));
-        $this->assertEquals('world', lapse('hello', function () {
+test('cancel caching', function () {
+    expect(lapse('hello', function () {
+        return 'world';
+    }))->toEqual('world')
+        ->and(lapse('hello', function () {
             return 'not called because its cached without expiration';
-        }));
+        }))->toEqual('world');
 
-        Lapse::rm('hello');
-        $this->assertEquals(null, lapse('hello', function () {
-            throw new LapseCancelException();
+    Lapse::rm('hello');
+    expect(lapse('hello', function () {
+        throw new LapseCancelException;
 
-            return 'bogus'; // never called
-        }));
-    }
-}
+        return 'bogus'; // never called
+    }))->toEqual(null);
+});
+
+test('expire', function () {
+    expect(lapse('60s', function () {
+        return 'minit';
+    }, 1))->toEqual('minit');
+    sleep(61);
+    expect(lapse('60s'))->toBeNull();
+});

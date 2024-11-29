@@ -1,12 +1,13 @@
 # Kirby Lapse
 
-![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-lapse?color=ae81ff)
-![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-lapse?color=272822)
-[![Build Status](https://flat.badgen.net/travis/bnomei/kirby3-lapse)](https://travis-ci.com/bnomei/kirby3-lapse)
-[![Coverage Status](https://flat.badgen.net/coveralls/c/github/bnomei/kirby3-lapse)](https://coveralls.io/github/bnomei/kirby3-lapse) 
-[![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-lapse)](https://codeclimate.com/github/bnomei/kirby3-lapse) 
-[![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
-
+[![Kirby 5](https://flat.badgen.net/badge/Kirby/5?color=ECC748)](https://getkirby.com)
+![PHP 8.2](https://flat.badgen.net/badge/PHP/8.2?color=4E5B93&icon=php&label)
+![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-lapse?color=ae81ff&icon=github&label)
+![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-lapse?color=272822&icon=github&label)
+[![Coverage](https://flat.badgen.net/codeclimate/coverage/bnomei/kirby3-lapse?icon=codeclimate&label)](https://codeclimate.com/github/bnomei/kirby3-lapse)
+[![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-lapse?icon=codeclimate&label)](https://codeclimate.com/github/bnomei/kirby3-lapse/issues)
+[![Discord](https://flat.badgen.net/badge/discord/bnomei?color=7289da&icon=discord&label)](https://discordapp.com/users/bnomei)
+[![Buymecoffee](https://flat.badgen.net/badge/icon/donate?icon=buymeacoffee&color=FF813F&label)](https://www.buymeacoffee.com/bnomei)
 Cache any data until set expiration time (with automatic keys).
 
 ## Installation
@@ -138,8 +139,8 @@ $data = lapse($objects, ...)
 
 The keys created by the plugin are [tagged with the current language](https://github.com/bnomei/kirby3-lapse/blob/master/classes/Lapse.php#L181). You will get a different cache value for each language.
 
-#### AutoID or BoostID
-If you use the [AutoID plugin](https://github.com/bnomei/kirby3-autoid) or [Boost plugin](https://github.com/bnomei/kirby3-boost) the modification timestamps will be retrieved at almost zero-cpu-cost and not causing the file to be checked on disk.
+#### BoostID
+If you use the [Boost plugin](https://github.com/bnomei/kirby3-boost) the modification timestamps will be retrieved at almost zero-cpu-cost and not causing the file to be checked on disk.
 
 
 ## FAQ
@@ -235,7 +236,7 @@ $wasRemoved = \Bnomei\Lapse::rm(
 );
 ```
 
-> 🏎️ if you use autoid or boost the modified lookups will be at almost zero-cpu cost.
+> 🏎️ if you use boost the modified lookups will be at almost zero-cpu cost.
 
 ## Cancel the caching
 

@@ -9,17 +9,15 @@ class LapseStatic
 {
     public static array $cache = [];
 
-    public static function getOrSet($key, Closure $closure)
+    public static function getOrSet(mixed $key, Closure $closure): mixed
     {
         $key = Lapse::singleton()->keyFromObject($key);
 
-        if ($value = A::get(static::$cache, $key, null)) {
+        if ($value = A::get(static::$cache, $key)) {
             return $value;
         }
 
-        if (!is_string($closure) && is_callable($closure)) {
-            static::$cache[$key] = $closure();
-        }
+        static::$cache[$key] = $closure();
 
         return static::$cache[$key];
     }

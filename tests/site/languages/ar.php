@@ -5,11 +5,11 @@ return [
     'default' => false,
     'direction' => 'rtl',
     'locale' => [
-        'LC_ALL' => 'ar_AE'
+        'LC_ALL' => 'ar_AE',
     ],
     'name' => 'Arabic',
     'translations' => [
 
     ],
-    'url' => null
+    'url' => null,
 ];

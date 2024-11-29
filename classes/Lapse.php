@@ -4,52 +4,43 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Closure;
 use Exception;
 use Kirby\Cache\Cache;
+use Kirby\Cms\File;
+use Kirby\Cms\FileVersion;
+use Kirby\Cms\Page;
+use Kirby\Cms\Site;
 use Kirby\Content\Field;
 use Kirby\Toolkit\A;
+use Kirby\Toolkit\Iterator;
 
-final class Lapse
+class Lapse
 {
-    /*
-     * @var string
-     */
     private const SALT = 'L4P$e';
 
-    /*
-     * @var string
-     */
     private const INDEX = 'LAPSE_INDEX';
 
-    /*
-     * @var int
-     */
     private const INDEX_LIMIT = 500;
 
-    /*
-     * @var \Kirby\Cache\Cache
-     */
-    private $cache;
+    private ?Cache $cache = null;
 
     private function cache(): Cache
     {
-        if (!$this->cache) {
+        if (! $this->cache) {
             $this->cache = kirby()->cache('bnomei.lapse');
         }
+
         return $this->cache;
     }
 
-    /*
-     * @var array
-     */
-    private $options;
+    private array $options;
 
     public function __construct(array $options = [])
     {
         $this->options = array_merge([
             'expires' => option('bnomei.lapse.expires', 0),
             'debug' => option('debug'),
-            'languageCode' => kirby()->language() ? kirby()->language()->code() : null,
             'indexLimit' => option('bnomei.lapse.indexLimit', null),
             'autoid' => function_exists('autoid') && function_exists('modified'),
             'boost' => function_exists('boost') && function_exists('modified'),
@@ -60,20 +51,21 @@ final class Lapse
         }
     }
 
-    public function option(?string $key = null)
+    public function option(?string $key = null): mixed
     {
         if ($key) {
             return A::get($this->options, $key);
         }
+
         return $this->options;
     }
 
-    public function set($key, $value = null, $expires = null)
+    public function set(mixed $key, mixed $value = null, ?int $expires = null): mixed
     {
         return $this->getAndSetIfMissingOrExpired($key, $value, $expires);
     }
 
-    public function getAndSetIfMissingOrExpired($key, $value = null, $expires = null)
+    public function getAndSetIfMissingOrExpired(mixed $key, mixed $value = null, ?int $expires = null): mixed
     {
         if ($this->option('debug')) {
             try {
@@ -83,12 +75,12 @@ final class Lapse
             }
         }
 
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             $key = $this->keyFromObject($key);
             $key = $this->hashKey($key);
         }
         $response = $this->cache()->get($key);
-        if ($response || !$value) {
+        if ($response || ! $value) {
             return $response;
         }
 
@@ -96,7 +88,7 @@ final class Lapse
             $response = $this->serialize($value); // might throw LapseCancelException
             $expires = $expires ?? $this->option('expires');
             $this->cache()->set(strval($key), $response, intval($expires));
-            $this->updateIndex($key, $this->option('indexLimit'));
+            $this->updateIndex($key, $this->option('indexLimit')); // @phpstan-ignore-line
         } catch (LapseCancelException $e) {
             // do not cache exceptions
             return null;
@@ -105,31 +97,22 @@ final class Lapse
         return $response;
     }
 
-    private static function isCallable($value): bool
+    public function get(mixed $key): mixed
     {
-        // do not call global helpers just methods or closures
-        return !is_string($value) && is_callable($value);
-    }
-
-    public function get($key)
-    {
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             $key = $this->keyFromObject($key);
             $key = $this->hashKey($key);
         }
-        return $this->cache()->get($key, null);
+
+        return $this->cache()->get($key);
     }
 
     /**
      * Removes a single cache file
-     *
-     * @param $key
-     *
-     * @return bool
      */
-    public function remove($key): bool
+    public function remove(mixed $key): bool
     {
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             $key = $this->keyFromObject($key);
             $key = $this->hashKey($key);
         }
@@ -141,40 +124,31 @@ final class Lapse
             }
             $this->cache()->set(self::INDEX, $index);
         }
+
         return $this->cache()->remove($key);
     }
 
-    /**
-     * @param $value
-     * @return mixed
-     */
-    public function serialize($value)
+    public function serialize(mixed $value): mixed
     {
         if (! $value) {
             return null;
         }
-        $value = self::isCallable($value) ? $value() : $value;
+        $value = $value instanceof Closure ? $value() : $value;
 
         if (is_array($value)) {
-            $items = [];
-            foreach ($value as $key => $item) {
-                $items[$key] = $this->serialize($item);
-            }
-            return $items;
+            return array_map(function ($item) {
+                return $this->serialize($item);
+            }, $value);
         }
 
-        if (is_a($value, 'Kirby\Content\Field')) {
+        if ($value instanceof Field) {
             return $value->value();
         }
 
         return $value;
     }
 
-    /**
-     * @param $key
-     * @return string
-     */
-    public function keyFromObject($key): string
+    public function keyFromObject(mixed $key): string
     {
         if (is_string($key)) {
             return $key;
@@ -184,40 +158,41 @@ final class Lapse
             return strval($key);
         }
 
-        if (is_array($key) || $key instanceof \Kirby\Toolkit\Iterator) {
+        if (is_array($key) || $key instanceof Iterator) {
             $items = [];
             foreach ($key as $item) {
                 $items[] = $this->keyFromObject($item);
             }
+
             return implode($items);
         }
 
-        if (is_object($key) && (
-            $key instanceof \Kirby\Cms\Site ||
-                $key instanceof \Kirby\Cms\Page ||
-                $key instanceof \Kirby\Cms\File ||
-                $key instanceof \Kirby\Cms\FileVersion
-        )
+        if ($key instanceof Site ||
+            $key instanceof Page ||
+            $key instanceof File ||
+            $key instanceof FileVersion
         ) {
             $modified = '';
             // lookup modified zero-cost...
             // do NOT read file from disk:  && $key->autoid()->isNotEmpty()
-            if ($this->option('autoid') || $this->option('boost')) {
+            if (function_exists('modified')) {
                 // @codeCoverageIgnoreStart
                 // use obj not string so autoid can index if needed
                 $modified = modified($key);
-            // autoid will check file on disk if needed
+                // autoid will check file on disk if needed
                 /*
                 if (!$modified) {
                     $modified = $key->modified();
                 }
                 */
-            // @codeCoverageIgnoreEnd
+                // @codeCoverageIgnoreEnd
             } else {
                 // ... or check file on disk now
-                if ($key instanceof \Kirby\Cms\Site) {
+                if ($key instanceof Site) {
                     // site->modified() would be ALL content files
-                    $modified = site()->modifiedTimestamp();
+                    $modified = site()->modifiedTimestamp(); // @phpstan-ignore-line
+                } elseif ($key instanceof FileVersion) {
+                    $modified = $key->original()->modified(); // @phpstan-ignore-line
                 } else {
                     $modified = $key->modified();
                 }
@@ -228,54 +203,48 @@ final class Lapse
             // this has nothing to do with uuids or autoid or boost but only with what one would expect
             // the automatic key of lapse per object to be.
             if (kirby()->multilang()) {
-                if ($key instanceof \Kirby\Cms\Site) {
+                if ($key instanceof Site) {
+                    /* TODO
                     $siteFile = site()->storage()->contentFile(
                         site()->storage()->defaultVersion(),
-                        kirby()->defaultLanguage()->code()
+                        kirby()->defaultLanguage()?->code()
                     )[0];
-                    $modified = $modified . filemtime($siteFile);
+                    $modified = $modified.filemtime($siteFile);
+                    */
+                    $modified = $modified.time().kirby()->defaultLanguage()?->code();
                 } else {
-                    $modified = $modified . $key->modified(kirby()->defaultLanguage()->code());
+                    $modified = $modified.$key->modified(kirby()->defaultLanguage()?->code()); // @phpstan-ignore-line
                 }
             }
 
-            return $key->id() . $modified;
+            return $key->id().$modified;
         }
 
-        if (is_object($key) && in_array(get_class($key), [Field::class])) {
-            return $key->key() . hash('xxh3', $key->value());
+        if (is_object($key) && get_class($key) == Field::class) {
+            return $key->key().hash('xxh3', strval($key->value()));
         }
 
         return strval($key);
     }
 
-    /**
-     * @param string $key
-     * @return string
-     */
     public function hashKey(string $key): string
     {
-        $hash = strval(hash('xxh3', $key . self::SALT));
-        if ($lang = $this->option('languageCode')) {
-            $hash .= '-' . $lang;
+        $hash = hash('xxh3', $key.self::SALT);
+        if (kirby()->multilang()) {
+            $hash .= '-'.kirby()->language()?->code();
         }
 
         return $hash;
     }
 
-    /**
-     * @param string|null $key
-     * @param null $indexLimit
-     * @return int|null
-     */
-    public function updateIndex(?string $key = null, $indexLimit = null): ?int
+    public function updateIndex(?string $key = null, ?int $indexLimit = null): ?int
     {
-        if (!$indexLimit) {
+        if (! $indexLimit) {
             return null;
         }
         $index = $this->cache()->get(self::INDEX, []);
         if ($key) {
-            array_push($index, [$key, microtime(true)]);
+            $index[] = [$key, microtime(true)];
         }
 
         if (count($index) > $indexLimit) {
@@ -290,12 +259,10 @@ final class Lapse
             $index = array_slice($index, 0, $indexLimit);
         }
         $this->cache()->set(self::INDEX, $index);
+
         return count($index);
     }
 
-    /**
-     * @return bool
-     */
     public function prune(): bool
     {
         return $this->updateIndex(null, self::INDEX_LIMIT) <= self::INDEX_LIMIT;
@@ -303,7 +270,6 @@ final class Lapse
 
     /**
      * Removes all cache files created by this plugin
-     * @return bool
      */
     public function flush(): bool
     {
@@ -313,54 +279,44 @@ final class Lapse
         } catch (Exception $e) {
             //
         }
+
         return $success;
     }
 
-    /*
-     * @var \Bnomei\Lapse
-     */
-    private static $singleton;
+    private static ?self $singleton = null;
 
-    public static function singleton()
+    public static function singleton(): self
     {
-        if (! self::$singleton) {
-            self::$singleton = new self();
+        if (self::$singleton === null) {
+            self::$singleton = new self;
         }
+
         return self::$singleton;
     }
 
-    /**
-     * @param $key
-     * @param null $value
-     * @param null $expires
-     * @return array|mixed|null
-     */
-    public static function io($key, $value = null, $expires = null)
+    public static function io(mixed $key, mixed $value = null, ?int $expires = null): mixed
     {
         return self::singleton()->getAndSetIfMissingOrExpired($key, $value, $expires);
     }
 
-    public static function gt($key)
+    public static function gt(mixed $key): mixed
     {
         return self::singleton()->get($key);
     }
 
-    public static function rm($key)
+    public static function rm(mixed $key): bool
     {
         return self::singleton()->remove($key);
     }
 
-    /**
-     * @param $key
-     * @return string
-     */
-    public static function hash($key)
+    public static function hash(mixed $key): string
     {
         $lapse = self::singleton();
-        if (!is_string($key)) {
+        if (! is_string($key)) {
             $key = $lapse->keyFromObject($key);
             $key = $lapse->hashKey($key);
         }
+
         return $lapse->hashKey($key);
     }
 }
